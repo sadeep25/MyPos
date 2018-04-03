@@ -47,15 +47,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Context\MyPosDb.cs" />
+    <Compile Include="DBContext\MyPosDb.cs" />
     <Compile Include="Entity\Customer.cs" />
     <Compile Include="Entity\Order.cs" />
     <Compile Include="Entity\OrderItem.cs" />
     <Compile Include="Entity\Product.cs" />
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Migrations\Configurations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Migrations\" />
     <Folder Include="Repository\" />
   </ItemGroup>
   <ItemGroup>

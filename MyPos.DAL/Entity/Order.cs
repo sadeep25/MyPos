@@ -14,7 +14,7 @@ namespace MyPos.DAL.Entity
         [Column(Order = 1)]
         public int ID { get; set; }
 
-        public virtual  Customer Customer { get; set; }
+        public virtual Customer Customer { get; set; }
 
         public DateTime OrderDate { get; set; }
 

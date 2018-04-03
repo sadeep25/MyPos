@@ -13,7 +13,7 @@ namespace MyPos.DAL.Entity
     public class Customer
     {
         [Key]
-        [Column(Order=1)]
+        [Column(Order = 1)]
         public int ID { get; set; }
 
         [Required]
@@ -27,7 +27,6 @@ namespace MyPos.DAL.Entity
         [MaxLength(250)]
         public string Address { get; set; }
 
-        public ICollection<Order> Orders { get; set; }
-        
+       
     }
 }
