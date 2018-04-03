@@ -46,5 +46,11 @@
     <Folder Include="Exceptions\" />
     <Folder Include="Services\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MyPos.DAL\MyPos.DAL.csproj">
+      <Project>{e015b3dd-2213-4953-b068-015748974d8a}</Project>
+      <Name>MyPos.DAL</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

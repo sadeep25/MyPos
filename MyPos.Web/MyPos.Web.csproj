@@ -204,6 +204,16 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MyPos.BL\MyPos.BL.csproj">
+      <Project>{b2bce139-1677-4f1a-a309-545a274c9e58}</Project>
+      <Name>MyPos.BL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MyPos.DAL\MyPos.DAL.csproj">
+      <Project>{e015b3dd-2213-4953-b068-015748974d8a}</Project>
+      <Name>MyPos.DAL</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
