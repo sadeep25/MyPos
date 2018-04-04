@@ -7,10 +7,10 @@ using System.Data.Entity;
 using MyPos.DAL.Entity;
 namespace MyPos.DAL.Context
 {
-    public class MyPosDb : DbContext
+    public class MyPosDbContext : DbContext
     {
 
-        public MyPosDb() : base("name=DefaultConnection")
+        public MyPosDbContext() : base("name=DefaultConnection")
         {
             
         }

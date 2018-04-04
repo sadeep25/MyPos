@@ -6,14 +6,14 @@ namespace MyPos.DAL.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<MyPos.DAL.Context.MyPosDb>
+    internal sealed class Configuration : DbMigrationsConfiguration<MyPos.DAL.Context.MyPosDbContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
         }
 
-        protected override void Seed(MyPos.DAL.Context.MyPosDb context)
+        protected override void Seed(MyPos.DAL.Context.MyPosDbContext context)
         {
             //  This method will be called after migrating to the latest version.
 
