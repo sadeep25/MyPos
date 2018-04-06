@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DBContext\MyPosDbContext.cs" />
+    <Compile Include="Entity\City.cs" />
     <Compile Include="Entity\Customer.cs" />
     <Compile Include="Entity\Order.cs" />
     <Compile Include="Entity\OrderItem.cs" />

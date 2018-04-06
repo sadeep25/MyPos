@@ -1,0 +1,41 @@
+﻿@model MyPos.DAL.Entity.City
+
+@{
+    ViewBag.Title = "CreateOrder";
+}
+
+<h2>CreateOrder</h2>
+
+<div class="col-md-6 col-md-offset-3">
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+
+            <hr />
+
+            <div class="form-group">
+
+                <div class="col-md-12">
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+
+                </div>
+            </div>
+
+        </div>
+    }
+
+</div>
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Styles.Render("~/Content/cssjqryUi")
+
+}

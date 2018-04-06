@@ -12,18 +12,30 @@ namespace MyPos.DAL.Repository
     {
         private MyPosDbContext context = new MyPosDbContext();
 
-        private GenericRepository<Customer> clientsRepository;
+        private GenericRepository<Customer> customerRepository;
+        private GenericRepository<Order> orderRepository;
 
 
-        public GenericRepository<Customer> ClientsRepository
+        public GenericRepository<Customer> CustomerRepository
         {
             get
             {
-                if (this.clientsRepository == null)
+                if (this.customerRepository == null)
                 {
-                    this.clientsRepository = new GenericRepository<Customer>(context);
+                    this.customerRepository = new GenericRepository<Customer>(context);
                 }
-                return clientsRepository;
+                return customerRepository;
+            }
+        }
+        public GenericRepository<Order> OrderRepository
+        {
+            get
+            {
+                if (this.orderRepository == null)
+                {
+                    this.orderRepository = new GenericRepository<Order>(context);
+                }
+                return orderRepository;
             }
         }
         public MyPosDbContext DbContext
