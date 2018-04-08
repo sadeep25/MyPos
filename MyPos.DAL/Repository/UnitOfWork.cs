@@ -14,6 +14,7 @@ namespace MyPos.DAL.Repository
 
         private GenericRepository<Customer> customerRepository;
         private GenericRepository<Order> orderRepository;
+        private GenericRepository<Product> productRepository;
 
 
         public GenericRepository<Customer> CustomerRepository
@@ -36,6 +37,16 @@ namespace MyPos.DAL.Repository
                     this.orderRepository = new GenericRepository<Order>(context);
                 }
                 return orderRepository;
+            }
+        }public GenericRepository<Product> ProductRepository
+        {
+            get
+            {
+                if (this.productRepository == null)
+                {
+                    this.productRepository = new GenericRepository<Product>(context);
+                }
+                return productRepository;
             }
         }
         public MyPosDbContext DbContext

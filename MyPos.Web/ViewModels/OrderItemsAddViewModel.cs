@@ -6,15 +6,15 @@ using System.Linq;
 using System.Web;
 
 namespace MyPos.Web.ViewModels
-{[Serializable]
-    public class OrderStartViewModel
+{
+    public class OrderItemsAddViewModel
     {
         public int CustomerID { get; set; }
-        [DisplayName("Customer Name : ")]
-        [Required]
+
+
         public string CustomerName { get; set; }
-        [DisplayName("Order Date : ")]
-        [Required]
         public DateTime OrderDate { get; set; }
+        public virtual List<SingleItemViewModel> OrderItems { get; set; }
+
     }
 }

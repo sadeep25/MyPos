@@ -1,4 +1,4 @@
-﻿@model MyPos.DAL.Entity.City
+﻿@model MyPos.Web.ViewModels.OrderStartViewModel
 
 @{
     ViewBag.Title = "CreateOrder";
@@ -6,27 +6,40 @@
 
 <h2>CreateOrder</h2>
 
-<div class="col-md-6 col-md-offset-3">
-    @using (Html.BeginForm())
-    {
-        @Html.AntiForgeryToken()
 
-        <div class="form-horizontal">
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
 
-            <hr />
+    <div class="form-horizontal">
 
-            <div class="form-group">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.CustomerID)
 
-                <div class="col-md-12">
-                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-
-                </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.CustomerName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CustomerName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CustomerName, "", new { @class = "text-danger" })
             </div>
-
         </div>
-    }
+        <div class="form-group">
+            @Html.LabelFor(model => model.OrderDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.OrderDate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.OrderDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Next" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
 
-</div>
+
 
 
 <div>

@@ -1,0 +1,93 @@
+﻿@model MyPos.Web.ViewModels.OrderItemsAddViewModel
+
+@{
+    ViewBag.Title = "OrderAddItem";
+}
+
+<h2>OrderAddItem</h2>
+
+<h2>KC</h2>
+<div>
+
+    <table id="ProductSelect" class="table ">
+        <thead>
+            <tr>
+                <th style="width:20%">Product</th>
+                <th style="width:30%">Product Description</th>
+                <th style="width:10%">Price</th>
+                <th style="width:8%">Quantity</th>
+                <th style="width:22%" class="text-center">Subtotal</th>
+                <th style="width:10%"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td data-th="Product"><input type="text" id="ProductName" class="form-control text-center " value="" /></td>
+                <td data-th="Description"><input type="text" id="ProductDescription" class="form-control text-center " value="" readonly /></td>
+                <td data-th="Price"><input type="number" id="ProductPrice" class="form-control text-center " value="" readonly /></td>
+                <td data-th="Quantity">
+                    <input type="number" id="ProductQuantity" class="form-control text-center ">
+                </td>
+                <td data-th="Subtotal" class="text-center">
+                    <input type="text" id="ProductSubTotal" class="form-control text-center  " value="" readonly>
+                </td>
+                <td class="actions" data-th="">
+                    <input type="button" id="AddItem" value="Add Item" />
+                    <input type="hidden" id="ProductId" value="" />
+                    <input type="hidden" id="ProductAvailableStock" value="" />
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+
+        </tfoot>
+    </table>
+    <hr />
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <table id="ShoppingCart" class="table ">
+            <thead>
+                <tr>
+                    <th style="width:20%"></th>
+                    <th style="width:30%"></th>
+                    <th style="width:10%"></th>
+                    <th style="width:8%"></th>
+                    <th style="width:22%" class="text-center"></th>
+                    <th style="width:10%"></th>
+                </tr>
+            </thead>
+            <tbody id="ItemTable">
+                @for (int i = 0; i < Model.OrderItems.Count; i++)
+                {
+
+                    <tr>
+                        <td data-th="Product">
+                            @Html.HiddenFor(m => m.OrderItems[i].ProductID, new { htmlAttributes = new { @readonly = "readonly" } })
+                        </td>
+                        <td data-th="Description">
+                            @Html.EditorFor(m => m.OrderItems[i].ProductName, new { htmlAttributes = new { @readonly = "readonly" } })
+                        </td>
+                        <td data-th="Price">
+                            @Html.EditorFor(m => m.OrderItems[i].ProductQuantity, new { htmlAttributes = new { @readonly = "readonly" } })
+                        </td>
+                        <td data-th="Quantity">
+                            @Html.EditorFor(m => m.OrderItems[i].ProductPrice, new { htmlAttributes = new { @readonly = "readonly" } })
+                        </td>
+                        <td data-th="Subtotal" class="text-center">
+                            @Html.EditorFor(m => m.OrderItems[i].SubTotal, new { htmlAttributes = new { @readonly = "readonly" } })
+                        </td>
+
+                    </tr>
+
+                }
+
+            </tbody>
+            <tfoot>
+
+            </tfoot>
+        </table>
+    }
+</div>

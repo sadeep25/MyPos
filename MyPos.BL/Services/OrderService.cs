@@ -32,10 +32,10 @@ namespace MyPos.BL.Services
 
         public Order GetOrderByID(int id)
         {
-            return unitOfWork.OrderRepository.Get(p => p.ID == id, null, null).FirstOrDefault();
+            return unitOfWork.OrderRepository.GetByID(id);
         }
 
-        public virtual void UpdateCustomer(Order model)
+        public virtual void UpdateOrder(Order model)
         {
             if (model == null) { throw new MyPosException("Model can not be null !"); }
             var editmodel = GetOrderByID(model.ID);

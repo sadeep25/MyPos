@@ -1,4 +1,7 @@
-﻿using MyPos.DAL.Entity;
+﻿using MyPos.BL.Services;
+using MyPos.DAL.Entity;
+using MyPos.DAL.Repository;
+using MyPos.Web.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,46 +12,95 @@ namespace MyPos.Web.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly CustomerService _customerService;
+        private readonly OrderService _orderService;
+        private readonly ProductService _productService;
+
+        public HomeController()
+           : this(new UnitOfWork())
+        { }
+
+
+        public HomeController(UnitOfWork unitOfWork)
+        {
+            this._customerService = new CustomerService(unitOfWork);
+            this._orderService = new OrderService(unitOfWork);
+            this._productService = new ProductService(unitOfWork);
+
+        }
+
+
+        [HttpPost]
+        public ActionResult CustomerAutocomplete(string searchKey)
+        {
+            var model = _customerService.GetCustomerAutoCompleteList(searchKey);
+
+
+            return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+
         [HttpGet]
         public ActionResult CreateOrder()
         {
             return View();
         }
+
+
         [HttpPost]
-        public ActionResult CreateOrder(string Prefix)
+        public ActionResult CreateOrder(OrderStartViewModel cu)
         {
-            //Note : you can bind same list from database
-            List<City> ObjList = new List<City>()
+
+            if (ModelState.IsValid)
             {
 
-                new City {Id=1,Name="Latur" },
-                new City {Id=2,Name="Mumbai" },
-                new City {Id=3,Name="Pune" },
-                new City {Id=4,Name="Delhi" },
-                new City {Id=5,Name="Dehradun" },
-                new City {Id=6,Name="Noida" },
-                new City {Id=7,Name="New Delhi" }
+                return RedirectToAction("OrderAddItem", cu);
+            }
+            return View(cu);
 
-        };
-            //Searching records from list using LINQ query
-            var CityName = (from N in ObjList
-                            where N.Name.StartsWith(Prefix)
-                          select new { N.Name,N.Id });
-            return Json(CityName, JsonRequestBehavior.AllowGet);
         }
+        //Oder Item Add
 
-        public ActionResult About()
+        [HttpPost]
+        public ActionResult ProductAutocompleteList(string searchKey)
         {
-            ViewBag.Message = "Your application description page.";
+            var model =_productService.GetProductAutoCompleteList(searchKey);
 
-            return View();
+
+            return Json(model, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Contact()
+        [HttpPost]
+        public ActionResult GetProductByID(int id)
         {
-            ViewBag.Message = "Your contact page.";
+            var model =_productService.GetProductByID(id);
 
-            return View();
+
+            return Json(model, JsonRequestBehavior.AllowGet);
         }
+        [HttpGet]
+        public ActionResult OrderAddItem(OrderStartViewModel orderStartViewModel)
+        {
+            var model = new OrderItemsAddViewModel
+            {
+                CustomerID = orderStartViewModel.CustomerID,
+                OrderDate = orderStartViewModel.OrderDate,
+                //OrderItems = new List<SingleItemViewModel>
+                //{
+                //    new SingleItemViewModel
+                //    {
+                //        ProductID=1,
+                //        ProductQuantity=30,
+                //        SubTotal=30
+                //    }
+
+                //}
+
+            };
+
+
+            return View(model);
+        }
+
     }
 }

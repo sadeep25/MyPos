@@ -25,14 +25,28 @@ namespace MyPos.BL.Services
             unitOfWork.Save();
         }
 
-        public IEnumerable<Customer> GetCustomerList()
-        {
-            return unitOfWork.CustomerRepository.Get(null, null, null);
-        }
+        //public IEnumerable<Customer> GetCustomerList()
+        //{
+        //    return unitOfWork.CustomerRepository.Get(null, null, null);
+        //}
 
         public Customer GetCustomerByID(int id)
         {
-            return unitOfWork.CustomerRepository.Get(p => p.ID == id, null, null).FirstOrDefault();
+            return unitOfWork.CustomerRepository.GetByID(id);
+        }
+
+        public IEnumerable<Customer> GetCustomerAutoCompleteList(string searchKey)
+        {
+            var model = (unitOfWork.CustomerRepository.Get()
+                  .Where(r => r.Name.StartsWith(searchKey, StringComparison.InvariantCultureIgnoreCase))
+                     .Select(r => new Customer
+                     {
+                         ID = r.ID,
+                         Name = r.Name,
+                        //EMail=r.EMail,
+                        //Address=r.Address
+                    }));
+            return model;
         }
 
         public virtual void UpdateCustomer(Customer model)
