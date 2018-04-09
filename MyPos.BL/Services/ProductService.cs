@@ -26,14 +26,14 @@ namespace MyPos.BL.Services
 
         public IEnumerable<Product> GetProductAutoCompleteList(string searchKey)
         {
-            var model = (unitOfWork.ProductRepository.Get()
+            var productList = (unitOfWork.ProductRepository.Get()
                   .Where(r => r.ProductName.StartsWith(searchKey, StringComparison.InvariantCultureIgnoreCase))
                      .Select(r => new Product
                      {
                          ID = r.ID,
                          ProductName = r.ProductName
                      }));
-            return model;
+            return productList;
         }
     }
 }

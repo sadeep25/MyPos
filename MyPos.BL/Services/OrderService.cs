@@ -25,11 +25,6 @@ namespace MyPos.BL.Services
             unitOfWork.Save();
         }
 
-        public IEnumerable<Order> GetOrderList()
-        {
-            return unitOfWork.OrderRepository.Get(null, null, null);
-        }
-
         public Order GetOrderByID(int id)
         {
             return unitOfWork.OrderRepository.GetByID(id);
@@ -45,7 +40,6 @@ namespace MyPos.BL.Services
             editmodel.OrderItems = model.OrderItems;
             editmodel.ShippingAddress = model.ShippingAddress;
             editmodel.Customer = model.Customer;
-
             unitOfWork.OrderRepository.Update(editmodel);
             unitOfWork.Save();
         }

@@ -14,12 +14,18 @@ namespace MyPos.DAL.Entity
         [Column(Order = 1)]
         public int ID { get; set; }
 
-        public virtual Customer Customer { get; set; }
+        
 
         public DateTime OrderDate { get; set; }
 
+        [MaxLength(250)]
         public string ShippingAddress { get; set; }
 
         public virtual ICollection<OrderItem> OrderItems { get; set; }
+        
+        //public int CustomerId { get; set; }
+
+        //[ForeignKey("CustomerId")]
+        public Customer Customer { get; set; }
     }
 }

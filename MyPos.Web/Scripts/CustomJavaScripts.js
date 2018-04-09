@@ -17,7 +17,7 @@ $(document).ready(function () {
         source: function (request, response) {
 
             $.ajax({
-                url: "/Home/CustomerAutocomplete",
+                url: "/Order/CustomerAutocomplete",
                 type: "POST",
                 dataType: "json",
                 data: { searchKey: request.term },
@@ -51,7 +51,7 @@ $(document).ready(function () {
         source: function (request, response) {
 
             $.ajax({
-                url: "/Home/ProductAutocompleteList",
+                url: "/Order/ProductAutocompleteList",
                 type: "POST",
                 dataType: "json",
                 data: { searchKey: request.term },
@@ -72,7 +72,7 @@ $(document).ready(function () {
             $("#CustomerID").val(ui.item.value);
 
             var options = {
-                url: "/Home/GetProductByID",
+                url: "/Order/GetProductByID",
                 type: "POST",
                 dataType: "json",
                 data: { id: ui.item.value }
@@ -95,9 +95,23 @@ $(document).ready(function () {
 $(document).ready(function () {
 
     $('#ProductQuantity').change(calculate);
-   
+
     function calculate(e) {
         $('#ProductSubTotal').val($('#ProductPrice').val() * $('#ProductQuantity').val());
     }
+
+});
+
+
+$(document).ready(function () {
+    $("#AddItem").click(function () {
+
+        $('#myTable').append('<tr><td data-th="Product">' + $('#ProductName').val()+'</td><td data-th="Description">' + $('#ProductDescription').val()+'</td><td data-th="Price">' + $('#ProductPrice').val()+'</td><td data-th="Quantity">' + $('#ProductQuantity').val()+'</td><td data-th="Subtotal" class="text-center">' + $('#ProductSubTotal').val()+'</td><td class="actions" data-th=""><input type="button" class="deleteRow"  value="Remove Item"><input type="hidden" id="ProductId" value="" /><input type="hidden" id="ProductAvailableStock" value="" /></td></tr>');
+
+    });
    
 });
+$(document).on('click', '.deleteRow', function (e) {
+    $(this).parents('tr').first().remove();
+});
+

@@ -25,11 +25,6 @@ namespace MyPos.BL.Services
             unitOfWork.Save();
         }
 
-        //public IEnumerable<Customer> GetCustomerList()
-        //{
-        //    return unitOfWork.CustomerRepository.Get(null, null, null);
-        //}
-
         public Customer GetCustomerByID(int id)
         {
             return unitOfWork.CustomerRepository.GetByID(id);
@@ -42,10 +37,8 @@ namespace MyPos.BL.Services
                      .Select(r => new Customer
                      {
                          ID = r.ID,
-                         Name = r.Name,
-                        //EMail=r.EMail,
-                        //Address=r.Address
-                    }));
+                         Name = r.Name
+                     }));
             return model;
         }
 
