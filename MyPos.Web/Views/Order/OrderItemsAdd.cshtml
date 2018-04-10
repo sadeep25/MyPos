@@ -1,11 +1,13 @@
-﻿@model MyPos.Web.ViewModels.OrderItemsAddViewModel
+﻿@model MyPos.Web.ViewModels.OrderStartViewModel
 
 
 <h2>Add Items To Cart :</h2>
 <hr />
 <div>
+    <input type="hidden" name="name" value="@Model.OrderDate" id="OderDateID" />
+    <input type="hidden" name="name" value="@Model.CustomerID" id="CustomerId" />
 
-    <table id="ProductSelect" class="table ">
+    <table id="ProductSelect" class="table orderLine1 ">
         <thead>
             <tr>
                 <th style="width:20%">Product</th>
@@ -54,7 +56,8 @@
         </thead>
         <tbody></tbody>
         <tfoot>
-
+            <input type="button" id="Save" value="Save" />
         </tfoot>
     </table>
+    <div id="test"></div>
 </div>

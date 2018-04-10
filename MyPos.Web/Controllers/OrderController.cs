@@ -12,6 +12,7 @@ namespace MyPos.Web.Controllers
 {
     public class OrderController : Controller
     {
+        //Declaring Service Variables
         private readonly CustomerService _customerService;
         private readonly OrderService _orderService;
         private readonly ProductService _productService;
@@ -19,7 +20,7 @@ namespace MyPos.Web.Controllers
         public OrderController()
            : this(new UnitOfWork())
         { }
-
+        //instantiating Services
         public OrderController(UnitOfWork unitOfWork)
         {
             this._customerService = new CustomerService(unitOfWork);
@@ -29,17 +30,15 @@ namespace MyPos.Web.Controllers
         }
 
 
-
-
-        
-
-        //Add New Order
+        //Get: Add New Order 
         [HttpGet]
         public ActionResult AddNewOrder()
         {
             return View();
         }
 
+
+        //Get: Add New Order 
         [HttpPost]
         public ActionResult AddNewOrder(OrderStartViewModel orderStartViewModel)
         {
@@ -59,33 +58,34 @@ namespace MyPos.Web.Controllers
             return Json(model, JsonRequestBehavior.AllowGet);
         }
 
-        
 
-        //Oder Items Add
+
+
+        //Get: Oder Items Add
 
         [HttpGet]
         public ActionResult OrderItemsAdd(OrderStartViewModel orderStartViewModel)
         {
-            var orderItemsAddViewModel = new OrderItemsAddViewModel
-            {
-                CustomerID = orderStartViewModel.CustomerID,
-                OrderDate = orderStartViewModel.OrderDate,
-                OrderItems = new List<SingleItemViewModel>
-                {
-                    new SingleItemViewModel
-                    {
-                        ProductID=1,
-                        ProductQuantity=30,
-                        SubTotal=30
-                    }
-
-                }
-
-            };
-
-
-            return View(orderItemsAddViewModel);
+            return View(orderStartViewModel);
         }
+
+
+
+        //Post: Oder Items Add
+        [HttpPost]
+        public ActionResult OrderItemsAdd(Order order)
+        {
+            order.ShippingAddress = _customerService.GetCustomerByID(order.CustomerId).Address;
+            if (ModelState.IsValid)
+            {
+                _orderService.Add(order);
+                return RedirectToAction("AddNewOrder");
+            }
+
+            return View(order);
+        }
+
+
         //Oder Item Add AJAX requests
         [HttpPost]
         public ActionResult ProductAutocompleteList(string searchKey)

@@ -13,14 +13,18 @@ namespace MyPos.DAL.Entity
         [Key]
         [Column(Order = 1)]
         public int ID { get; set; }
+
         [Required]
         [MaxLength(60)]
         public string ProductName { get; set; }
+
         [Required]
         [MaxLength(60)]
         public string ProductDescription { get; set; }
+
         [Required]
         public Decimal CurrentPrice { get; set; }
+
         [Required]
         public int StockAvailable { get; set; }
 

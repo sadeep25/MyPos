@@ -9,7 +9,7 @@ using MyPos.DAL.Entity;
 
 namespace MyPos.DAL.Entity
 {
-    [Serializable()]
+   
     public class Customer
     {
         [Key]

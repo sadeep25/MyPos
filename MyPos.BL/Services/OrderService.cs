@@ -39,7 +39,7 @@ namespace MyPos.BL.Services
             editmodel.OrderDate = model.OrderDate;
             editmodel.OrderItems = model.OrderItems;
             editmodel.ShippingAddress = model.ShippingAddress;
-            editmodel.Customer = model.Customer;
+            editmodel.CustomerId = model.CustomerId;
             unitOfWork.OrderRepository.Update(editmodel);
             unitOfWork.Save();
         }
