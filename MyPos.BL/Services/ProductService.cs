@@ -35,5 +35,24 @@ namespace MyPos.BL.Services
                      }));
             return productList;
         }
+
+
+        public virtual void UpdatProductQuantityr(Product model, int QuantitySold)
+        {
+            if (model == null) { throw new MyPosException("Model can not be null !"); }
+            var editmodel = GetProductByID(model.ID);
+            if (editmodel == null) { throw new MyPosException("No matching Order found!"); }
+            if (editmodel.StockAvailable>=QuantitySold)
+            {
+                editmodel.StockAvailable = editmodel.StockAvailable - QuantitySold;
+            }
+            else
+            {
+                { throw new MyPosException("There not enough stock available to make this "); }
+            }
+            
+            unitOfWork.Save();
+        }
+
     }
 }

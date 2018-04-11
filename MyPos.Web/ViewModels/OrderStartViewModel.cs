@@ -6,15 +6,16 @@ using System.Linq;
 using System.Web;
 
 namespace MyPos.Web.ViewModels
-{[Serializable]
+{
     public class OrderStartViewModel
     {
         public int CustomerID { get; set; }
         [DisplayName("Customer Name : ")]
-        [Required]
+        [Required(ErrorMessage = "Customer Name Is A Required Field")]
         public string CustomerName { get; set; }
         [DisplayName("Order Date : ")]
-        [Required]
+        [Required(ErrorMessage = "Order Date Is A Required Field")]
+        [DataType(DataType.DateTime,ErrorMessage ="Please Enter A Valid Date")]
         public DateTime OrderDate { get; set; }
     }
 }

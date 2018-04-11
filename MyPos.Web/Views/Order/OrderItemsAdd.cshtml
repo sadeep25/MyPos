@@ -1,11 +1,14 @@
-﻿@model MyPos.Web.ViewModels.OrderStartViewModel
+﻿@model MyPos.DAL.Entity.Order
 
 
-<h2>Add Items To Cart :</h2>
-<hr />
+
+
 <div>
+    <h3>Add Items To Cart :</h3>
+    <div id="errorMessages" class="alert-danger"></div>
+    <hr />
     <input type="hidden" name="name" value="@Model.OrderDate" id="OderDateID" />
-    <input type="hidden" name="name" value="@Model.CustomerID" id="CustomerId" />
+    <input type="hidden" name="name" value="@Model.CustomerId" id="CustomerId" />
 
     <table id="ProductSelect" class="table orderLine1 ">
         <thead>

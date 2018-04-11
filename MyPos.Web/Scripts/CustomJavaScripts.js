@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
-
+    var itemsArray = [];
     //setting Jquery DateTimePicker
-    $('input[type=datetime]').datepicker({
+    $('#OrderDate').datepicker({
         dateFormat: "dd/M/yy",
         changeMonth: true,
         changeYear: true,
@@ -20,24 +20,41 @@
                 data: { searchKey: request.term },
                 success: function (data) {
 
-                    response($.map(data, function (item) {
+                    if (data.length == 0) {
+                        var error = [{ ID: -1, Name: "There Is No Such A Customer In Database" }];
+                        response($.map(error, function (item) {
 
-                        return { label: item.Name, value: item.ID };
-                    }));
+                            return { label: item.Name, value: item.ID };
+                        }));
+                    }
+                    else {
+                        response($.map(data, function (item) {
+
+                            return { label: item.Name, value: item.ID };
+                        }));
+                    }
 
                 }
             });
         },
-        messages: {
-            noResults: "", results: ""
-        },
+
         select: function (event, ui) {
             event.preventDefault();
-            $("#CustomerName").val(ui.item.label);
-            $("#CustomerID").val(ui.item.value);
+            if (ui.item.value == -1) {
+                $("#CustomerName").val("");
+            } else {
+                $("#CustomerName").val(ui.item.label);
+                $("#CustomerID").val(ui.item.value);
+            }
 
+
+        },
+        change: function (event, ui) {
+            if (ui.item == null) {
+                //here is null if entered value is not match in suggestion list
+                $(this).val((ui.item ? ui.item.id : ""));
+            }
         }
-
 
     });
 
@@ -53,55 +70,112 @@
                 data: { searchKey: request.term },
                 success: function (data) {
 
-                    response($.map(data, function (item) {
+                    if (data.length == 0) {
+                        var error = [{ ID: -1, ProductName: "There Is No Such A Product In Database" }];
+                        response($.map(error, function (item) {
 
-                        return { label: item.ProductName, value: item.ID };
-                    }));
+                            return { label: item.ProductName, value: item.ID };
+                        }));
+                    }
+                    else {
+                        response($.map(data, function (item) {
 
+                            return { label: item.ProductName, value: item.ID };
+                        }));
+                    }
                 }
             });
         },
 
         select: function (event, ui) {
             event.preventDefault();
-            $("#ProductName").val(ui.item.label);
-            $("#CustomerID").val(ui.item.value);
+            if (ui.item.value == -1) {
+                $("#ProductName").val("");
+            } else {
+                $("#ProductName").val(ui.item.label);
+                $("#CustomerID").val(ui.item.value);
+                $('#ProductName').css("border-color", "");
+                $('#errorMessages').html("");
+                var options = {
+                    url: "/Order/GetProductByID",
+                    type: "POST",
+                    dataType: "json",
+                    data: { id: ui.item.value }
+                };
 
-            var options = {
-                url: "/Order/GetProductByID",
-                type: "POST",
-                dataType: "json",
-                data: { id: ui.item.value }
-            };
+                $.ajax(options).done(function (data) {
 
-            $.ajax(options).done(function (data) {
+                    $("#ProductId").val(data.ID);
+                    $("#ProductDescription").val(data.ProductDescription);
+                    $("#ProductPrice").val(data.CurrentPrice);
+                    $("#ProductAvailableStock").val(data.StockAvailable);
 
-                $("#ProductId").val(data.ID);
-                $("#ProductDescription").val(data.ProductDescription);
-                $("#ProductPrice").val(data.CurrentPrice);
-                $("#ProductAvailableStock").val(data.StockAvailable);
-
-            });
+                });
+            }
+        },
+        change: function (event, ui) {
+            if (ui.item == null) {
+                //here is null if entered value is not match in suggestion list
+                $(this).val((ui.item ? ui.item.id : ""));
+            }
         }
 
 
     });
 
-    $('#ProductQuantity').change(CalculateSubTotal);
-
+    $('#ProductQuantity').keyup(CalculateSubTotal);
+    var notValid = false;
     //Function to Calculate Subtotal of an Odrder Item According to Quantity
     function CalculateSubTotal(e) {
-        $('#ProductSubTotal').val($('#ProductPrice').val() * $('#ProductQuantity').val());
+        $('#errorMessages').html("");
+        $('#ProductQuantity').css("border-color", "");
+        var quantity = $('#ProductQuantity').val();
+        var AvailableStock = $('#ProductAvailableStock').val();
+        
+        if ((AvailableStock - quantity)<0) {
+            $('#errorMessages').html("There Is No Stock Available To Make This Order");
+            $('#ProductQuantity').css("border-color", "#ff0000");
+            notValid = true;
+           
+        } else if (quantity > 10) {
+           
+            $('#errorMessages').html("You Can't Add More Than 10 Item In a Row");
+            $('#ProductQuantity').css("border-color", "#ff0000");
+            notValid = true;
+        } else {
+           
+            $('#ProductSubTotal').val($('#ProductPrice').val() * $('#ProductQuantity').val());
+            notValid = false;
+        }
+
     }
     //Add Order Item to Customer Shopping Cart Table
     $("#AddItem").click(function () {
+        var i = $('#ProductId').val();
+        //debugger;
+        if ($('#ProductId').val() == "") {
+            $('#ProductName').focus();
+            $('#ProductName').css("border-color", "#ff0000");
+            $('#errorMessages').html("<p>Please Select A Product To Add</p>");
 
-        $('#myTable').append('<tr><td style="display:none;  data-th="Product">' + $('#ProductId').val() + '<td data-th="Product">' + $('#ProductName').val() + '</td><td data-th="Description">' + $('#ProductDescription').val() + '</td><td data-th="Price">' + $('#ProductPrice').val() + '</td><td data-th="Quantity">' + $('#ProductQuantity').val() + '</td><td data-th="Subtotal" class="text-center">' + $('#ProductSubTotal').val() + '</td><td class="actions" data-th=""><input type="button" class="deleteRow"  value="Remove Item"><input type="hidden" id="ProductId" value="" /><input type="hidden" id="ProductAvailableStock" value="" /></td></tr>');
-        $('.orderLine1 input[type="text"],input[type="number"]').val('');
+        } else if ($('#ProductQuantity').val() == "" || notValid||$('#ProductQuantity').val()<="0") {
+            $('#ProductQuantity').focus();
+            $('#ProductQuantity').css("border-color", "#ff0000");
+            $('#errorMessages').html("<p>Please Enter A Valid Quantity</p>");
+        } else {
+            //alert("Need to select a product");
+            var arrayItem = { Id: $('#ProductId').val() };
+            itemsArray.push(arrayItem);
+            $('#myTable').append('<tr><td style="display:none;  data-th="Product">' + $('#ProductId').val() + '<td data-th="Product">' + $('#ProductName').val() + '</td><td data-th="Description">' + $('#ProductDescription').val() + '</td><td data-th="Price">' + $('#ProductPrice').val() + '</td><td data-th="Quantity">' + $('#ProductQuantity').val() + '</td><td data-th="Subtotal" class="text-center">' + $('#ProductSubTotal').val() + '</td><td class="actions" data-th=""><input type="button" class="deleteRow"  value="Remove Item"><input type="hidden" id="ProductId" value="" /><input type="hidden" id="ProductAvailableStock" value="" /></td></tr>');
+            debugger;
+            $('.orderLine1 input[type="text"],input[type="number"]').val('');
+
+        }
+
     });
     //Save Order To Database
     $('#Save').click(function (e) {
-       
+
         var array = [];
         var headers = ["ProductId", "Quantity", "Price"];
         //Reading Customers Shopping Cart Table Values To An Array(Only Product Id, Quantity And SubTotal )
@@ -113,15 +187,15 @@
                     arrayItem[headers[headersIndex]] = $(item).html();
                     headersIndex++;
                 }
-                
+
             });
             array.push(arrayItem);
         });
 
-        
+
         var orderDateEntered = $('#OderDateID').val();
         var customerId = $('#CustomerId').val()
-        
+
         $.ajax({
 
             type: "POST",
@@ -133,11 +207,22 @@
 
             },
             success: function (result) {
-                window.location = "/Order/AddNewOrder";
+                //debugger;
+                //window.location.href = result.redirectUrl;
+                if (result.success) {
+                    window.location.href = result.redirectUrl;
+                } else {
+                    debugger;
+                    for (var error in result.errors) {
+
+                        $('#errorMessages').append(result.errors[error] + '<br />');
+                    }
+                }
             },
-            error: function (result) {
-                alert('error');
-            }
+            //error: function (result) {
+            //    debugger;
+
+            //}
         });
 
     });
@@ -148,3 +233,4 @@ $(document).on('click', '.deleteRow', function (e) {
     $(this).parents('tr').first().remove();
 });
 
+//

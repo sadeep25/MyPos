@@ -22,3 +22,10 @@ select,
 textarea {
     max-width: 280px;
 }
+
+/*CSS stop Disable input spinners*/
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }

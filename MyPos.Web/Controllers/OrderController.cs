@@ -1,4 +1,5 @@
-﻿using MyPos.BL.Services;
+﻿using MyPos.BL.Exceptions;
+using MyPos.BL.Services;
 using MyPos.DAL.Entity;
 using MyPos.DAL.Repository;
 using MyPos.Web.ViewModels;
@@ -42,10 +43,13 @@ namespace MyPos.Web.Controllers
         [HttpPost]
         public ActionResult AddNewOrder(OrderStartViewModel orderStartViewModel)
         {
+            Order order = new Order();
+            order.CustomerId = orderStartViewModel.CustomerID;
+            order.OrderDate = orderStartViewModel.OrderDate;
 
             if (ModelState.IsValid)
             {
-                return RedirectToAction("OrderItemsAdd", orderStartViewModel);
+                return RedirectToAction("OrderItemsAdd", order);
             }
             return View(orderStartViewModel);
 
@@ -64,25 +68,52 @@ namespace MyPos.Web.Controllers
         //Get: Oder Items Add
 
         [HttpGet]
-        public ActionResult OrderItemsAdd(OrderStartViewModel orderStartViewModel)
+
+        public ActionResult OrderItemsAdd(Order order)
         {
-            return View(orderStartViewModel);
+            return View(order);
         }
 
 
 
         //Post: Oder Items Add
         [HttpPost]
-        public ActionResult OrderItemsAdd(Order order)
+        [ActionName("OrderItemsAdd")]
+        public ActionResult OrderItemsAddPost(Order order)
         {
             order.ShippingAddress = _customerService.GetCustomerByID(order.CustomerId).Address;
+
+            foreach (var item in order.OrderItems)
+            {
+                try
+                {
+                    _productService.UpdatProductQuantityr(_productService.GetProductByID(item.ProductId), item.Quantity);
+                }
+                catch (MyPosException exp)
+                {
+                    ModelState.AddModelError("error", exp.Message);
+                }
+
+            }
+
             if (ModelState.IsValid)
             {
                 _orderService.Add(order);
-                return RedirectToAction("AddNewOrder");
+                //return RedirectToAction("AddNewOrder");
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action("OrderDetails", "Order", order)
+                });
             }
 
-            return View(order);
+            return Json(new
+
+            {
+                success = false,
+                errors = ModelState.Keys.SelectMany(k => ModelState[k].Errors)
+                                .Select(m => m.ErrorMessage).ToArray()
+            });
         }
 
 
@@ -99,6 +130,13 @@ namespace MyPos.Web.Controllers
         {
             var model = _productService.GetProductByID(id);
             return Json(model, JsonRequestBehavior.AllowGet);
+        }
+        [HttpGet]
+
+        public ActionResult OrderDetails(Order order)
+        {
+            //var model=_orderService.GetOrderByID(id);
+            return View(order);
         }
     }
 }

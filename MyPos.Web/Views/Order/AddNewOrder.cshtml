@@ -23,7 +23,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.OrderDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.OrderDate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.TextBoxFor(m => m.OrderDate, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.OrderDate, "", new { @class = "text-danger" })
             </div>
         </div>
