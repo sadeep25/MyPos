@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace MyPos.DAL.Entity
 
         [Required]
         [MaxLength(150)]
+        [DisplayName("Customer Name")]
         public string Name { get; set; }
 
         [EmailAddress]

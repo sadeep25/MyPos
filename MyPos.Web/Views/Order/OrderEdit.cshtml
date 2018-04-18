@@ -1,0 +1,107 @@
+﻿@model MyPos.DAL.Entity.Order
+
+@{
+    /**/
+
+    ViewBag.Title = "OrderEdit";
+}
+
+<h2>OrderEdit</h2>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-md" role="document">
+        <div class="modal-content">
+            <div id="errorMessages" class="alert-danger"></div>
+            <table id="ProductSelect" class="table orderLine1 ">
+                <thead>
+                    <tr>
+                        <th style="width:20%">Product</th>
+                        <th style="width:30%">Product Description</th>
+                        <th style="width:10%">Price</th>
+                        <th style="width:8%">Quantity</th>
+                        <th style="width:22%" class="text-center">Subtotal</th>
+                        <th style="width:10%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-th="Product"><input type="text" id="ProductName" class="form-control text-center " value="" /></td>
+                        <td data-th="Description"><input type="text" id="ProductDescription" class="form-control text-center " value="" readonly /></td>
+                        <td data-th="Price"><input type="number" id="ProductPrice" class="form-control text-center " value="" readonly /></td>
+                        <td data-th="Quantity">
+                            <input type="number" id="ProductQuantity" class="form-control text-center ">
+                        </td>
+                        <td data-th="Subtotal" class="text-center">
+                            <input type="text" id="ProductSubTotal" class="form-control text-center  " value="" readonly>
+                        </td>
+                        <td class="actions" data-th="">
+
+                            <input type="hidden" id="ProductId" value="" />
+                            <input type="hidden" id="ProductAvailableStock" value="" />
+                            <input type="hidden" id="OrderItemId" value="" />
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+
+                </tfoot>
+            </table>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="EditOrderItemClose">Close</button>
+                <button type="button" class="btn btn-primary" id="EditOrderItem">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table id="EditOrderItemTable" class="table ">
+    <thead>
+        <tr>
+            <th style="width:15%">Product</th>
+            <th style="width:15%">Product Description</th>
+            <th style="width:10%">Price</th>
+            <th style="width:10%">Quantity</th>
+            <th style="width:10%" class="text-center">Subtotal</th>
+            <th style="width:10%"></th>
+            <th style="width:10%"></th>
+            <th style="width:20%"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var orderItem in Model.OrderItems)
+        {
+            <tr>
+                <td data-th="Product">@orderItem.Product.ProductName</td>
+                <td data-th="Description">@orderItem.Product.ProductDescription</td>
+                <td data-th="Price">@orderItem.Product.CurrentPrice</td>
+                <td data-th="Quantity">@orderItem.Quantity</td>
+                <td data-th="Subtotal" class="text-center">@orderItem.Price</td>
+                <td class="text-center" style="visibility:hidden;">@orderItem.ID</td>
+                <td class="text-center" style="visibility:hidden;">@orderItem.ProductId</td>
+                <td data-th="">
+
+                    <a href="javascript:void(0)" class="Edit">Edit |</a>
+                    <a href="javascript:void(0)" class="Delete">| Remove</a>
+
+
+                </td>
+            </tr>
+
+        }
+
+    </tbody>
+    <tfoot>
+
+    </tfoot>
+</table>
+<hr />
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

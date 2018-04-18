@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyPos.DAL.Entity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -17,5 +18,7 @@ namespace MyPos.Web.ViewModels
         [Required(ErrorMessage = "Order Date Is A Required Field")]
         [DataType(DataType.DateTime,ErrorMessage ="Please Enter A Valid Date")]
         public DateTime OrderDate { get; set; }
+
+        public virtual IEnumerable<Order> RecentOrders { get; set; }
     }
 }
