@@ -17,25 +17,32 @@ namespace MyPos.Web.Controllers
         private readonly CustomerService _customerService;
         private readonly OrderService _orderService;
         private readonly ProductService _productService;
+        private readonly OrderItemService _orderItemService;
 
         public OrderController()
            : this(new UnitOfWork())
         { }
+
+
         //instantiating Services
         public OrderController(UnitOfWork unitOfWork)
         {
             this._customerService = new CustomerService(unitOfWork);
             this._orderService = new OrderService(unitOfWork);
             this._productService = new ProductService(unitOfWork);
+            this._orderItemService = new OrderItemService(unitOfWork);
 
         }
-
 
         //Get: Add New Order 
         [HttpGet]
         public ActionResult AddNewOrder()
         {
-            return View();
+            OrderStartViewModel orderStartViewModel = new OrderStartViewModel();
+
+            orderStartViewModel.RecentOrders = _orderService.GetRecentOrders();
+
+            return View(orderStartViewModel);
         }
 
 
@@ -82,7 +89,7 @@ namespace MyPos.Web.Controllers
         public ActionResult OrderItemsAddPost(Order order)
         {
             order.ShippingAddress = _customerService.GetCustomerByID(order.CustomerId).Address;
-
+            //this needs to change to a function that checks whether available stocks are enough
             foreach (var item in order.OrderItems)
             {
                 try
@@ -99,11 +106,12 @@ namespace MyPos.Web.Controllers
             if (ModelState.IsValid)
             {
                 _orderService.Add(order);
+                int NewOrderId = _orderService.GetLatestOrderIDFromCustomerID(order.CustomerId);
                 //return RedirectToAction("AddNewOrder");
                 return Json(new
                 {
                     success = true,
-                    redirectUrl = Url.Action("OrderDetails", "Order", order)
+                    redirectUrl = Url.Action("OrderDetails", "Order", new { id = NewOrderId })
                 });
             }
 
@@ -133,10 +141,66 @@ namespace MyPos.Web.Controllers
         }
         [HttpGet]
 
-        public ActionResult OrderDetails(Order order)
+        public ActionResult OrderDetails(int Id)
         {
-            //var model=_orderService.GetOrderByID(id);
-            return View(order);
+            var model = _orderService.GetOrderByID(Id);
+            return View(model);
         }
+
+        [HttpGet]
+
+        public ActionResult OrderEdit(int Id)
+        {
+            var model = _orderService.GetOrderByID(Id);
+            return View(model);
+        }
+
+        [HttpPost]
+
+        public ActionResult OrderEdit(Order order)
+        {
+            if (ModelState.IsValid)
+            {
+                _orderService.UpdateOrder(order);
+                return RedirectToAction("OrderDetails", "Order", new { id = order.ID });
+            }
+            else
+            {
+                return View(order);
+            }
+
+
+
+        }
+
+        //// GET: tblDepartMents/Delete/5
+        //public ActionResult Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //    }
+        //    tblDepartMent tblDepartMent = db.tblDepartMents.Find(id);
+        //    if (tblDepartMent == null)
+        //    {
+        //        return HttpNotFound();
+        //    }
+        //    return View(tblDepartMent);
+        //}
+
+        // POST: tblDepartMents/Delete/5
+
+        [HttpPost]
+        public ActionResult DeleteOrderItem(int OrderItemId)
+        {
+            _orderItemService.DeleteOrderItem(OrderItemId);
+
+            return Json(new
+            {
+                success = true,
+               
+            });
+        }
+
     }
 }

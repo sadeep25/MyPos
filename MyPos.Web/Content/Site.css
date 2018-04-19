@@ -29,3 +29,19 @@ textarea {
         -webkit-appearance: none;
         margin: 0;
     }
+
+
+.ui-autocomplete {
+    z-index: 215000000 !important;
+}
+
+.modal {
+    position: absolute;
+    top: 20%;
+    left: 20px;
+    bottom: 0;
+    left: 0;
+    z-index: 10040;
+    overflow: auto;
+    overflow-y: auto;
+}

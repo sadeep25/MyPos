@@ -29,6 +29,29 @@ namespace MyPos.BL.Services
         {
             return unitOfWork.OrderRepository.GetByID(id);
         }
+        //new
+        public IEnumerable<Order> GetRecentOrders()
+        {
+            var orderList = (unitOfWork.OrderRepository.Get()
+                .OrderByDescending(x => x.ID)
+                .Select(r => new Order
+                {
+                    Customer = r.Customer,
+                    ID = r.ID,
+                    OrderDate = r.OrderDate,
+                    ShippingAddress = r.ShippingAddress
+                })).Take(5);
+
+
+            return orderList;
+        }
+        //new
+        public int GetLatestOrderIDFromCustomerID(int id)
+        {
+            var orderId = unitOfWork.OrderRepository.Get()
+                .Where(r => r.CustomerId == id).OrderByDescending(x => x.ID).FirstOrDefault().ID;
+            return orderId;
+        }
 
         public virtual void UpdateOrder(Order model)
         {

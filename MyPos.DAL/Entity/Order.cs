@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using MyPos.DAL.Entity;
 namespace MyPos.DAL.Entity
 {
+    [Serializable]
     public class Order
     {
         [Key]
@@ -26,6 +27,6 @@ namespace MyPos.DAL.Entity
         public virtual ICollection<OrderItem> OrderItems { get; set; }
 
         [ForeignKey("CustomerId")]
-        public Customer Customer { get; set; }
+        public virtual Customer Customer { get; set; }
     }
 }
