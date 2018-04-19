@@ -1,0 +1,22 @@
+﻿@model MyPos.DAL.Entity.Order
+
+@foreach (var orderItem in Model.OrderItems)
+{
+    <tr>
+        <td data-th="Product">@orderItem.Product.ProductName</td>
+        <td data-th="Description">@orderItem.Product.ProductDescription</td>
+        <td data-th="Price">@orderItem.Product.CurrentPrice</td>
+        <td data-th="Quantity">@orderItem.Quantity</td>
+        <td data-th="Subtotal" class="text-center">@orderItem.Price</td>
+        <td class="text-center" style="visibility:hidden;">@orderItem.ID</td>
+        <td class="text-center" style="visibility:hidden;">@orderItem.ProductId</td>
+        <td data-th="">
+
+            <a href="javascript:void(0)" class="Edit">Edit |</a>
+            <a href="javascript:void(0)" class="Delete">| Remove</a>
+
+
+        </td>
+    </tr>
+
+}

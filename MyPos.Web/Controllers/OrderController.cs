@@ -17,6 +17,7 @@ namespace MyPos.Web.Controllers
         private readonly CustomerService _customerService;
         private readonly OrderService _orderService;
         private readonly ProductService _productService;
+        private readonly OrderItemService _orderItemService;
 
         public OrderController()
            : this(new UnitOfWork())
@@ -29,6 +30,7 @@ namespace MyPos.Web.Controllers
             this._customerService = new CustomerService(unitOfWork);
             this._orderService = new OrderService(unitOfWork);
             this._productService = new ProductService(unitOfWork);
+            this._orderItemService = new OrderItemService(unitOfWork);
 
         }
 
@@ -37,7 +39,7 @@ namespace MyPos.Web.Controllers
         public ActionResult AddNewOrder()
         {
             OrderStartViewModel orderStartViewModel = new OrderStartViewModel();
-            
+
             orderStartViewModel.RecentOrders = _orderService.GetRecentOrders();
 
             return View(orderStartViewModel);
@@ -87,7 +89,7 @@ namespace MyPos.Web.Controllers
         public ActionResult OrderItemsAddPost(Order order)
         {
             order.ShippingAddress = _customerService.GetCustomerByID(order.CustomerId).Address;
-
+            //this needs to change to a function that checks whether available stocks are enough
             foreach (var item in order.OrderItems)
             {
                 try
@@ -109,7 +111,7 @@ namespace MyPos.Web.Controllers
                 return Json(new
                 {
                     success = true,
-                    redirectUrl = Url.Action("OrderDetails", "Order", new { id=NewOrderId})
+                    redirectUrl = Url.Action("OrderDetails", "Order", new { id = NewOrderId })
                 });
             }
 
@@ -167,7 +169,7 @@ namespace MyPos.Web.Controllers
                 return View(order);
             }
 
-           
+
 
         }
 
@@ -186,16 +188,19 @@ namespace MyPos.Web.Controllers
         //    return View(tblDepartMent);
         //}
 
-        //// POST: tblDepartMents/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult DeleteConfirmed(int id)
-        //{
-        //    tblDepartMent tblDepartMent = db.tblDepartMents.Find(id);
-        //    db.tblDepartMents.Remove(tblDepartMent);
-        //    db.SaveChanges();
-        //    return RedirectToAction("Index");
-        //}
+        // POST: tblDepartMents/Delete/5
+
+        [HttpPost]
+        public ActionResult DeleteOrderItem(int OrderItemId)
+        {
+            _orderItemService.DeleteOrderItem(OrderItemId);
+
+            return Json(new
+            {
+                success = true,
+               
+            });
+        }
 
     }
 }

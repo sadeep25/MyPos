@@ -15,5 +15,13 @@ namespace MyPos.BL.Services
         {
             this.unitOfWork = unitOfWork;
         }
+        
+        public void DeleteOrderItem(int id)
+        {
+            unitOfWork.OrderItemRepository.Delete(id);
+            unitOfWork.Save();
+            //need to add an exception.
+        }
+
     }
 }

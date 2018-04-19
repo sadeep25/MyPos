@@ -207,8 +207,7 @@
 
             },
             success: function (result) {
-                //debugger;
-                //window.location.href = result.redirectUrl;
+
                 if (result.success) {
 
                     window.location.href = result.redirectUrl;
@@ -220,17 +219,14 @@
                     }
                 }
             },
-            //error: function (result) {
-            //    debugger;
 
-            //}
         });
 
     });
     //Save Edited Order Items
     $("#EditOrderItem").click(function (e) {
         var productName = $('#ProductName').val();
-        debugger;
+
         if (productName == "") {
             $('#ProductName').focus();
             $('#ProductName').css("border-color", "#ff0000");
@@ -263,6 +259,35 @@
         $('#exampleModal').modal('hide');
     });
 });
+//Remove An Ordered Item Ajax
+$(".Delete").click(function (e) {
+    var ItemId = $(this).parents('tr').find("td:eq( 5 )").html();
+    $(this).parents('tr').first().remove();
+    $.ajax({
+
+        type: "POST",
+        url: "/Order/DeleteOrderItem",
+        data: {
+            OrderItemId: ItemId
+
+
+        },
+        success: function (result) {
+
+            if (result.success) {
+                alert("Item Deleted");
+            } else {
+
+                alert("Item not Deleted");
+            }
+        },
+
+    });
+});
+
+
+
+
 //Remove Ordered Item From Shopping Cart Table 
 $(document).on('click', '.deleteRow', function (e) {
     $(this).parents('tr').first().remove();
