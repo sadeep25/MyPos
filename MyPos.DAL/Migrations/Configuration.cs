@@ -19,25 +19,25 @@ namespace MyPos.DAL.Migrations
 
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
             //  to avoid creating duplicate seed data.
-            context.Customers.AddOrUpdate(e => e.Name,
+            context.Customers.AddOrUpdate(e => e.CustomerName,
                  new Customer()
                  {
-                     Name = "Sam",
-                     Address = "Colombo",
-                     EMail = "Sam@gmail.com"
+                     CustomerName = "Sam",
+                     CustomerAddress = "Colombo",
+                     CustomerEMail = "Sam@gmail.com"
 
                  }, new Customer()
                  {
-                     Name = "Adam",
-                     Address = "Kalutara",
-                     EMail = "Adam@gmail.com"
+                     CustomerName = "Adam",
+                     CustomerAddress = "Kalutara",
+                     CustomerEMail = "Adam@gmail.com"
 
                  },
                 new Customer()
                 {
-                    Name = "Mark",
-                    Address = "Negambo",
-                    EMail = "Mark@gmail.com"
+                    CustomerName = "Mark",
+                    CustomerAddress = "Negambo",
+                    CustomerEMail = "Mark@gmail.com"
 
                 }
 );

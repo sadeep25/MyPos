@@ -54,32 +54,19 @@
         </div>
     </div>
 </div>
+<div>
+    <input type="hidden" id="OrderId" value="@Model.OrderId" />
+    <input type="hidden" id="OrderId" value="@Model.OrderId" />
+</div>
+<div id="orderEditItem">
+    @Html.Partial("_OrderItemList", Model)
 
-<table id="EditOrderItemTable" class="table ">
-    <thead>
-        <tr>
-            <th style="width:15%">Product</th>
-            <th style="width:15%">Product Description</th>
-            <th style="width:10%">Price</th>
-            <th style="width:10%">Quantity</th>
-            <th style="width:10%" class="text-center">Subtotal</th>
-            <th style="width:10%"></th>
-            <th style="width:10%"></th>
-            <th style="width:20%"></th>
-        </tr>
-    </thead>
-    <tbody>
-        @Html.Partial("_OrderItemList", Model)
-    </tbody>
-    <tfoot>
+</div>
 
-    </tfoot>
-</table>
-<hr />
 
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    <button type="button" class="btn btn-primary" id="UpdateEditedItem"> Update Order</button>
 </div>
 
 @section Scripts {

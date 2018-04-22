@@ -15,19 +15,20 @@ namespace MyPos.DAL.Entity
     {
         [Key]
         [Column(Order = 1)]
-        public int ID { get; set; }
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        public int CustomerId { get; set; }
 
         [Required]
         [MaxLength(150)]
         [DisplayName("Customer Name")]
-        public string Name { get; set; }
+        public string CustomerName { get; set; }
 
         [EmailAddress]
         [MaxLength(250)]
-        public string EMail { get; set; }
+        public string CustomerEMail { get; set; }
 
         [MaxLength(250)]
-        public string Address { get; set; }
+        public string CustomerAddress { get; set; }
 
        
     }

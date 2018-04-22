@@ -11,11 +11,11 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Customer.Name)
+            @Html.DisplayNameFor(model => model.OrderCustomer.CustomerName)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Customer.Name)
+            @Html.DisplayFor(model => model.OrderCustomer.CustomerName)
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.OrderDate)
@@ -26,11 +26,11 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.ShippingAddress)
+            @Html.DisplayNameFor(model => model.OrderShippingAddress)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.ShippingAddress)
+            @Html.DisplayFor(model => model.OrderShippingAddress)
         </dd>
 
     </dl>
@@ -54,9 +54,9 @@
         <tr>
             <td data-th="Product">@i.Product.ProductName</td>
             <td data-th="Description">@i.Product.ProductDescription</td>
-            <td data-th="Price">@i.Product.CurrentPrice</td>
-            <td data-th="Quantity">@i.Quantity</td>
-            <td data-th="Subtotal" class="text-center">@(i.Product.CurrentPrice*i.Quantity)</td>
+            <td data-th="Price">@i.Product.ProductCurrentPrice</td>
+            <td data-th="Quantity">@i.OrderItemQuantity</td>
+            <td data-th="Subtotal" class="text-center">@(i.Product.ProductCurrentPrice*i.OrderItemQuantity)</td>
             
         </tr>
         }

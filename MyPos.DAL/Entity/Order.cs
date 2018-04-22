@@ -13,20 +13,22 @@ namespace MyPos.DAL.Entity
     {
         [Key]
         [Column(Order = 1)]
-        public int ID { get; set; }
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        public int OrderId { get; set; }
 
         public DateTime OrderDate { get; set; }
 
         [MaxLength(250)]
-        public string ShippingAddress { get; set; }
+        public string OrderShippingAddress { get; set; }
 
-        public int CustomerId { get; set; }
+        public int OrderCustomerId { get; set; }
 
-
+        public int OrderTotal { get; set; }
+        public bool OrderIsDeleted { get; set; }
 
         public virtual ICollection<OrderItem> OrderItems { get; set; }
 
-        [ForeignKey("CustomerId")]
-        public virtual Customer Customer { get; set; }
+        [ForeignKey("OrderCustomerId")]
+        public virtual Customer OrderCustomer { get; set; }
     }
 }

@@ -33,11 +33,11 @@ namespace MyPos.BL.Services
         public IEnumerable<Customer> GetCustomerAutoCompleteList(string searchKey)
         {
             var model = (unitOfWork.CustomerRepository.Get()
-                  .Where(r => r.Name.StartsWith(searchKey, StringComparison.InvariantCultureIgnoreCase))
+                  .Where(r => r.CustomerName.StartsWith(searchKey, StringComparison.InvariantCultureIgnoreCase))
                      .Select(r => new Customer
                      {
-                         ID = r.ID,
-                         Name = r.Name
+                         CustomerId = r.CustomerId,
+                         CustomerName = r.CustomerName
                      }));
             return model;
         }
@@ -45,12 +45,12 @@ namespace MyPos.BL.Services
         public virtual void UpdateCustomer(Customer model)
         {
             if (model == null) { throw new MyPosException("Model can not be null !"); }
-            var editmodel = GetCustomerByID(model.ID);
+            var editmodel = GetCustomerByID(model.CustomerId);
             if (editmodel == null) { throw new MyPosException("No matching Customer found!"); }
 
-            editmodel.Name = model.Name;
-            editmodel.EMail = model.EMail;
-            editmodel.Address = model.Address;
+            editmodel.CustomerName = model.CustomerName;
+            editmodel.CustomerEMail = model.CustomerEMail;
+            editmodel.CustomerAddress = model.CustomerAddress;
 
             unitOfWork.CustomerRepository.Update(editmodel);
             unitOfWork.Save();

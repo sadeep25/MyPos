@@ -8,7 +8,7 @@
     <div id="errorMessages" class="alert-danger"></div>
     <hr />
     <input type="hidden" name="name" value="@Model.OrderDate" id="OderDateID" />
-    <input type="hidden" name="name" value="@Model.CustomerId" id="CustomerId" />
+    <input type="hidden" name="name" value="@Model.OrderCustomerId" id="CustomerId" />
 
     <table id="ProductSelect" class="table orderLine1 ">
         <thead>
@@ -49,17 +49,23 @@
     <table id="myTable" class="table ">
         <thead>
             <tr>
-                <th style="width:20%">Product</th>
+                <th style="width:20% ">Product</th>
                 <th style="width:30%">Product Description</th>
                 <th style="width:10%">Price</th>
-                <th style="width:8%">Quantity</th>
-                <th style="width:22%" class="text-center">Subtotal</th>
+                <th style="width:10%">Quantity</th>
+                <th style="width:20%" class="text-center">Subtotal</th>
                 <th style="width:10%"></th>
             </tr>
         </thead>
         <tbody></tbody>
         <tfoot>
-
+            <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td data-th="Quantity">Grand Total :</td>
+            <td id="GrandTotal" data-th="Subtotal" class="text-center"></td>
+            </tr>
         </tfoot>
     </table>
     <input type="button" id="Save" value="Save" />

@@ -51,7 +51,7 @@ namespace MyPos.Web.Controllers
         public ActionResult AddNewOrder(OrderStartViewModel orderStartViewModel)
         {
             Order order = new Order();
-            order.CustomerId = orderStartViewModel.CustomerID;
+            order.OrderCustomerId = orderStartViewModel.CustomerID;
             order.OrderDate = orderStartViewModel.OrderDate;
 
             if (ModelState.IsValid)
@@ -61,6 +61,9 @@ namespace MyPos.Web.Controllers
             return View(orderStartViewModel);
 
         }
+
+
+
         //Add New Order AJAX Requests
         [HttpPost]
         public ActionResult CustomerAutocomplete(string searchKey)
@@ -88,13 +91,17 @@ namespace MyPos.Web.Controllers
         [ActionName("OrderItemsAdd")]
         public ActionResult OrderItemsAddPost(Order order)
         {
-            order.ShippingAddress = _customerService.GetCustomerByID(order.CustomerId).Address;
+            order.OrderShippingAddress = _customerService.GetCustomerByID(order.OrderCustomerId).CustomerAddress;
+            
             //this needs to change to a function that checks whether available stocks are enough
+            var nextOrderId = _orderService.GetLatestOrderId();
+            order.OrderId = nextOrderId;
             foreach (var item in order.OrderItems)
             {
+                item.OrderItemOrderId = nextOrderId;
                 try
                 {
-                    _productService.UpdatProductQuantityr(_productService.GetProductByID(item.ProductId), item.Quantity);
+                    _productService.UpdatProductQuantityr(_productService.GetProductByID(item.OrderItemProductId), item.OrderItemQuantity);
                 }
                 catch (MyPosException exp)
                 {
@@ -106,12 +113,12 @@ namespace MyPos.Web.Controllers
             if (ModelState.IsValid)
             {
                 _orderService.Add(order);
-                int NewOrderId = _orderService.GetLatestOrderIDFromCustomerID(order.CustomerId);
+                
                 //return RedirectToAction("AddNewOrder");
                 return Json(new
                 {
                     success = true,
-                    redirectUrl = Url.Action("OrderDetails", "Order", new { id = NewOrderId })
+                    redirectUrl = Url.Action("OrderDetails", "Order", new { id = nextOrderId })
                 });
             }
 
@@ -125,6 +132,7 @@ namespace MyPos.Web.Controllers
         }
 
 
+
         //Oder Item Add AJAX requests
         [HttpPost]
         public ActionResult ProductAutocompleteList(string searchKey)
@@ -133,12 +141,17 @@ namespace MyPos.Web.Controllers
             return Json(model, JsonRequestBehavior.AllowGet);
         }
 
+
+
         [HttpPost]
         public ActionResult GetProductByID(int id)
         {
             var model = _productService.GetProductByID(id);
             return Json(model, JsonRequestBehavior.AllowGet);
         }
+
+
+
         [HttpGet]
 
         public ActionResult OrderDetails(int Id)
@@ -147,13 +160,18 @@ namespace MyPos.Web.Controllers
             return View(model);
         }
 
+
+
         [HttpGet]
 
         public ActionResult OrderEdit(int Id)
         {
             var model = _orderService.GetOrderByID(Id);
+            model.OrderItems = _orderItemService.GetListOfOrderItemsByOrderId(Id).ToList();
             return View(model);
         }
+
+
 
         [HttpPost]
 
@@ -162,7 +180,7 @@ namespace MyPos.Web.Controllers
             if (ModelState.IsValid)
             {
                 _orderService.UpdateOrder(order);
-                return RedirectToAction("OrderDetails", "Order", new { id = order.ID });
+                return RedirectToAction("OrderDetails", "Order", new { id = order.OrderId });
             }
             else
             {
@@ -173,33 +191,38 @@ namespace MyPos.Web.Controllers
 
         }
 
-        //// GET: tblDepartMents/Delete/5
-        //public ActionResult Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-        //    }
-        //    tblDepartMent tblDepartMent = db.tblDepartMents.Find(id);
-        //    if (tblDepartMent == null)
-        //    {
-        //        return HttpNotFound();
-        //    }
-        //    return View(tblDepartMent);
-        //}
+      
 
         // POST: tblDepartMents/Delete/5
 
         [HttpPost]
-        public ActionResult DeleteOrderItem(int OrderItemId)
+        public ActionResult DeleteOrderItem(int OrderItemId,int OrderId)
         {
-            _orderItemService.DeleteOrderItem(OrderItemId);
+            var model = _orderService.GetOrderByID(OrderId);
+            var orderItemList=_orderItemService.DeleteOrderItem(OrderItemId);
+            model.OrderItems = orderItemList.ToList();
+            return PartialView("_OrderItemList", model);
+            //return Json(new
+            //{
+            //    success = true,
 
-            return Json(new
-            {
-                success = true,
-               
-            });
+            //});
+        }
+
+
+
+        [HttpGet]
+        public ActionResult DeleteOrder(int OrderId)
+        {
+            //_orderItemService.DeleteOrderItem(OrderItemId);
+            _orderService.DeleteOrder(OrderId);
+            OrderStartViewModel orderStartViewModel = new OrderStartViewModel();
+
+            orderStartViewModel.RecentOrders = _orderService.GetRecentOrders();
+
+            return PartialView("_RecentOrders", orderStartViewModel);
+
+
         }
 
     }

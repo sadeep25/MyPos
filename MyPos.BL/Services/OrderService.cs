@@ -29,17 +29,36 @@ namespace MyPos.BL.Services
         {
             return unitOfWork.OrderRepository.GetByID(id);
         }
+
+        public int GetLatestOrderId()
+        {
+            int nextOrderId;
+            int? currentOrderId  = (unitOfWork.OrderRepository.Get()
+               .OrderByDescending(x => x.OrderId)
+              .FirstOrDefault()?.OrderId);
+            if (currentOrderId == null)
+            {
+                nextOrderId = 0;
+            }
+            else
+            {
+                nextOrderId = (int)currentOrderId + 1;
+            }
+            return nextOrderId;
+        }
         //new
         public IEnumerable<Order> GetRecentOrders()
         {
             var orderList = (unitOfWork.OrderRepository.Get()
-                .OrderByDescending(x => x.ID)
+                .Where(x=>x.OrderIsDeleted!=true)
+                .OrderByDescending(x => x.OrderId)
                 .Select(r => new Order
                 {
-                    Customer = r.Customer,
-                    ID = r.ID,
+                    OrderCustomer = r.OrderCustomer,
+                    OrderId = r.OrderId,
                     OrderDate = r.OrderDate,
-                    ShippingAddress = r.ShippingAddress
+                    OrderShippingAddress = r.OrderShippingAddress,
+                    OrderTotal=r.OrderTotal
                 })).Take(5);
 
 
@@ -49,20 +68,31 @@ namespace MyPos.BL.Services
         public int GetLatestOrderIDFromCustomerID(int id)
         {
             var orderId = unitOfWork.OrderRepository.Get()
-                .Where(r => r.CustomerId == id).OrderByDescending(x => x.ID).FirstOrDefault().ID;
+                .Where(r => r.OrderCustomerId == id && r.OrderIsDeleted!=true).OrderByDescending(x => x.OrderId).FirstOrDefault().OrderId;
             return orderId;
+        }
+
+        public void DeleteOrder(int id)
+        {
+            //unitOfWork.OrderRepository.Delete(id);
+            //unitOfWork.Save();
+            var editmodel = GetOrderByID(id);
+            editmodel.OrderIsDeleted = true;
+            unitOfWork.OrderRepository.Update(editmodel);
+            unitOfWork.Save();
+            //need to add an exception.
         }
 
         public virtual void UpdateOrder(Order model)
         {
             if (model == null) { throw new MyPosException("Model can not be null !"); }
-            var editmodel = GetOrderByID(model.ID);
+            var editmodel = GetOrderByID(model.OrderId);
             if (editmodel == null) { throw new MyPosException("No matching Order found!"); }
 
             editmodel.OrderDate = model.OrderDate;
             editmodel.OrderItems = model.OrderItems;
-            editmodel.ShippingAddress = model.ShippingAddress;
-            editmodel.CustomerId = model.CustomerId;
+            editmodel.OrderShippingAddress = model.OrderShippingAddress;
+            editmodel.OrderCustomerId = model.OrderCustomerId;
             unitOfWork.OrderRepository.Update(editmodel);
             unitOfWork.Save();
         }

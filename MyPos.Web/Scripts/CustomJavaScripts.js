@@ -1,4 +1,5 @@
-﻿$(document).ready(function () {
+﻿var GrandTotal = 0;
+$(document).ready(function () {
     var itemsArray = [];
     //setting Jquery DateTimePicker
     $('#OrderDate').datepicker({
@@ -21,16 +22,16 @@
                 success: function (data) {
 
                     if (data.length == 0) {
-                        var error = [{ ID: -1, Name: "There Is No Such A Customer In Database" }];
+                        var error = [{ CustomerId: -1, CustomerName: "There Is No Such A Customer In Database" }];
                         response($.map(error, function (item) {
 
-                            return { label: item.Name, value: item.ID };
+                            return { label: item.CustomerName, value: item.CustomerId };
                         }));
                     }
                     else {
                         response($.map(data, function (item) {
 
-                            return { label: item.Name, value: item.ID };
+                            return { label: item.CustomerName, value: item.CustomerId };
                         }));
                     }
 
@@ -71,16 +72,16 @@
                 success: function (data) {
 
                     if (data.length == 0) {
-                        var error = [{ ID: -1, ProductName: "There Is No Such A Product In Database" }];
+                        var error = [{ ProductId: -1, ProductName: "There Is No Such A Product In Database" }];
                         response($.map(error, function (item) {
 
-                            return { label: item.ProductName, value: item.ID };
+                            return { label: item.ProductName, value: item.ProductId };
                         }));
                     }
                     else {
                         response($.map(data, function (item) {
 
-                            return { label: item.ProductName, value: item.ID };
+                            return { label: item.ProductName, value: item.ProductId };
                         }));
                     }
                 }
@@ -104,11 +105,11 @@
                 };
 
                 $.ajax(options).done(function (data) {
-
-                    $("#ProductId").val(data.ID);
+                  
+                    $("#ProductId").val(data.ProductId);
                     $("#ProductDescription").val(data.ProductDescription);
-                    $("#ProductPrice").val(data.CurrentPrice);
-                    $("#ProductAvailableStock").val(data.StockAvailable);
+                    $("#ProductPrice").val(data.ProductCurrentPrice);
+                    $("#ProductAvailableStock").val(data.ProductStockAvailable);
 
                 });
             }
@@ -150,6 +151,7 @@
 
     }
     //Add Order Item to Customer Shopping Cart Table
+
     $("#AddItem").click(function () {
         var i = $('#ProductId').val();
         //debugger;
@@ -166,8 +168,9 @@
             //alert("Need to select a product");
             var arrayItem = { Id: $('#ProductId').val() };
             itemsArray.push(arrayItem);
-            $('#myTable').append('<tr><td style="display:none;  data-th="Product">' + $('#ProductId').val() + '</td><td data-th="Product">' + $('#ProductName').val() + '</td><td data-th="Description">' + $('#ProductDescription').val() + '</td><td data-th="Price">' + $('#ProductPrice').val() + '</td><td data-th="Quantity">' + $('#ProductQuantity').val() + '</td><td data-th="Subtotal" class="text-center">' + $('#ProductSubTotal').val() + '</td><td class="actions" data-th=""><input type="button" class="deleteRow"  value="Remove Item"><input type="hidden" id="ProductId" value="" /><input type="hidden" id="ProductAvailableStock" value="" /></td></tr>');
-
+            $('#myTable').append('<tr class="orderItemList"><td style="display:none;  data-th="Product">' + $('#ProductId').val() + '</td><td data-th="Product">' + $('#ProductName').val() + '</td><td data-th="Description">' + $('#ProductDescription').val() + '</td><td data-th="Price">' + $('#ProductPrice').val() + '</td><td data-th="Quantity">' + $('#ProductQuantity').val() + '</td><td data-th="Subtotal" class="text-center">' + $('#ProductSubTotal').val() + '</td><td class="actions" data-th=""><input type="button" class="deleteRow"  value="Remove Item"><input type="hidden" id="ProductId" value="" /><input type="hidden" id="ProductAvailableStock" value="" /></td></tr>');
+            GrandTotal = GrandTotal + parseInt($('#ProductSubTotal').val());
+            $('#GrandTotal').html(GrandTotal.toString());
             $('.orderLine1 input[type="text"],input[type="number"]').val('');
 
         }
@@ -177,9 +180,9 @@
     $('#Save').click(function (e) {
 
         var array = [];
-        var headers = ["ProductId", "Quantity", "Price"];
+        var headers = ["OrderItemProductId", "OrderItemQuantity", "OrderItemTotalPrice"];
         //Reading Customers Shopping Cart Table Values To An Array(Only Product Id, Quantity And SubTotal )
-        $('#myTable tr').has('td').each(function () {
+        $('#myTable .orderItemList').has('td').each(function () {
             var arrayItem = {};
             var headersIndex = 0;
             $('td', $(this)).each(function (index, item) {
@@ -189,21 +192,24 @@
                 }
 
             });
+
             array.push(arrayItem);
         });
 
 
         var orderDateEntered = $('#OderDateID').val();
-        var customerId = $('#CustomerId').val()
-
+        var customerId = $('#CustomerId').val();
+        var orderTotal = $('#GrandTotal').html();
+        debugger;
         $.ajax({
 
             type: "POST",
             url: "/Order/OrderItemsAdd",
             data: {
-                CustomerId: customerId,
+                OrderCustomerId: customerId,
                 OrderDate: orderDateEntered,
-                OrderItems: array
+                OrderItems: array,
+                OrderTotal:orderTotal
 
             },
             success: function (result) {
@@ -258,31 +264,146 @@
         $('.orderLine1 input[type="text"],input[type="number"]').val('');
         $('#exampleModal').modal('hide');
     });
+    //Delete Recent Order Ajax
+    $(".deleteRecentOrder").click(function (e) {
+        var orderId = $(this).parents('tr').find("td:eq( 0 )").html();
+        debugger;
+        var options = {
+            url: "/Order/DeleteOrder",
+            type: "GET",
+            data: { OrderId: orderId,}
+        };
+
+        $.ajax(options).done(function (data) {
+            var $target = $('#recentOrderDiv');
+            var $newHtml = $(data);
+            debugger;
+            $target.replaceWith($newHtml);
+            $newHtml.effect("highlight");
+        });
+        //$.ajax({
+
+        //    type: "GET",
+        //    url: "/Order/DeleteOrder",
+        //    data: {
+        //        OrderId: orderId,
+                
+
+        //    },
+        //    success: function (result) {
+
+        //        if (result.success) {
+
+        //            alert("sucess")
+        //        } else {
+
+        //            for (var error in result.errors) {
+
+        //                $('#errorMessages').append(result.errors[error] + '<br />');
+        //            }
+        //        }
+        //    },
+
+        //});
+    });
+
 });
-//Remove An Ordered Item Ajax
-$(".Delete").click(function (e) {
-    var ItemId = $(this).parents('tr').find("td:eq( 5 )").html();
-    $(this).parents('tr').first().remove();
+
+//Update Edited Item in Database
+$('#UpdateEditedItem').click(function (e) {
+   
+    var array = [];
+    var orderId = $('#OrderId').val();
+    var headers = ["OrderItemQuantity", "OrderItemTotalPrice", "OrderItemId", "OrderItemProductId", "OrderItemOrderId"];
+    //Reading Customers Shopping Cart Table Values To An Array(Only Product Id, Quantity And SubTotal )
+    $('#EditOrderItemTable .orderItemList').has('td').each(function () {
+        var arrayItem = {};
+        var headersIndex = 0;
+        $('td', $(this)).each(function (index, item) {
+            if (index == 3 || index == 4 || index == 5 || index == 6 || index==7) {
+                arrayItem[headers[headersIndex]] = $(item).html();
+                headersIndex++;
+            }
+             
+        });
+        array.push(arrayItem);
+    });
+    
+
+    var orderDateEntered = $('#OderDateID').val();
+    var customerId = $('#CustomerId').val();
+    var orderId = $('#OrderId').val();
+    var orderTotal = $('#GrandTotal').html();
+    debugger;
     $.ajax({
 
         type: "POST",
-        url: "/Order/DeleteOrderItem",
+        url: "/Order/OrderEdit",
         data: {
-            OrderItemId: ItemId
-
-
+            OrderId: orderId,
+            OrderCustomerId: customerId,
+            OrderDate: orderDateEntered,
+            OrderItems: array,
+            OrderTotal: orderTotal
         },
         success: function (result) {
 
             if (result.success) {
-                alert("Item Deleted");
+
+                window.location.href = result.redirectUrl;
             } else {
 
-                alert("Item not Deleted");
+                for (var error in result.errors) {
+
+                    $('#errorMessages').append(result.errors[error] + '<br />');
+                }
             }
         },
 
     });
+
+});
+
+//Remove An Ordered Item Ajax
+$(".Delete").click(function (e) {
+    var ItemId = $(this).parents('tr').find("td:eq( 5 )").html();
+    var orderId = $('#OrderId').val();
+    var options = {
+        url: "/Order/DeleteOrderItem",
+        type: "POST",
+        data: {
+            OrderItemId: ItemId,
+            OrderId: orderId}
+    };
+
+    $.ajax(options).done(function (data) {
+        var $target = $('#orderEditItem');
+        var $newHtml = $(data);
+        debugger;
+        $target.replaceWith($newHtml);
+        $newHtml.effect("highlight");
+    });
+    //$(this).parents('tr').first().remove();
+    //$.ajax({
+
+    //    type: "POST",
+    //    url: "/Order/DeleteOrderItem",
+    //    data: {
+    //        OrderItemId: ItemId
+
+
+    //    },
+    //    success: function (result) {
+
+    //        if (result.success) {
+    //            alert("Item Deleted");
+    //        } else {
+
+    //            alert("Item not Deleted");
+    //        }
+    //    },
+
+    //});
 });
 
 
@@ -290,11 +411,18 @@ $(".Delete").click(function (e) {
 
 //Remove Ordered Item From Shopping Cart Table 
 $(document).on('click', '.deleteRow', function (e) {
+
+    //var r = parseInt($(this).parents('tr').find("td:eq( 5 )").html());
+    //var GrandTotal = parseInt($('#GrandTotal').html());
+    GrandTotal = GrandTotal - parseInt($(this).parents('tr').find("td:eq( 5 )").html());
+
+    $('#GrandTotal').html(GrandTotal.toString());
     $(this).parents('tr').first().remove();
+
 });
 
 
-//Remove Ordered Item From Shopping Cart Table
+//Edit Ordered Item From Shopping Cart Table
 $(document).on('click', '.Edit', function (e) {
     $('#exampleModal').modal();
 
@@ -310,19 +438,20 @@ $(document).on('click', '.Edit', function (e) {
     };
 
     $.ajax(options).done(function (data) {
-
-        $("#ProductId").val(data.ID);
+       
+        $("#ProductId").val(data.ProductId);
         $("#ProductName").val(data.ProductName);
         $("#ProductDescription").val(data.ProductDescription);
-        $("#ProductPrice").val(data.CurrentPrice);
-        $("#ProductAvailableStock").val(data.StockAvailable);
+        $("#ProductPrice").val(data.ProductCurrentPrice);
+        $("#ProductAvailableStock").val(data.ProductStockAvailable);
         $("#ProductQuantity").val(Quantity.toString());
-        $("#ProductSubTotal").val(Quantity * data.CurrentPrice);
+        $("#ProductSubTotal").val(Quantity * data.ProductCurrentPrice);
         $("#OrderItemId").val(OrderItemId.toString());
 
 
     });
 
 });
+
 
 

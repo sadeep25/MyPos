@@ -30,7 +30,7 @@ namespace MyPos.BL.Services
                   .Where(r => r.ProductName.StartsWith(searchKey, StringComparison.InvariantCultureIgnoreCase))
                      .Select(r => new Product
                      {
-                         ID = r.ID,
+                         ProductId = r.ProductId,
                          ProductName = r.ProductName
                      }));
             return productList;
@@ -40,11 +40,11 @@ namespace MyPos.BL.Services
         public virtual void UpdatProductQuantityr(Product model, int QuantitySold)
         {
             if (model == null) { throw new MyPosException("Model can not be null !"); }
-            var editmodel = GetProductByID(model.ID);
+            var editmodel = GetProductByID(model.ProductId);
             if (editmodel == null) { throw new MyPosException("No matching Order found!"); }
-            if (editmodel.StockAvailable>=QuantitySold)
+            if (editmodel.ProductStockAvailable>=QuantitySold)
             {
-                editmodel.StockAvailable = editmodel.StockAvailable - QuantitySold;
+                editmodel.ProductStockAvailable = editmodel.ProductStockAvailable - QuantitySold;
             }
             else
             {

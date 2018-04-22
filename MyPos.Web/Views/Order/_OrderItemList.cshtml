@@ -1,22 +1,49 @@
 ﻿@model MyPos.DAL.Entity.Order
+<table id="EditOrderItemTable" class="table ">
+    <thead>
+        <tr>
+            <th style="width:15%">Product</th>
+            <th style="width:15%">Product Description</th>
+            <th style="width:10%">Price</th>
+            <th style="width:10%">Quantity</th>
+            <th style="width:10%" class="text-center">Subtotal</th>
+            <th style="width:9%"></th>
+            <th style="width:9%"></th>
+            <th style="width:9%"></th>
+            <th style="width:20%"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var orderItem in Model.OrderItems)
+        {
+            <tr class="orderItemList">
+                <td data-th="Product">@orderItem.Product.ProductName</td>
+                <td data-th="Description">@orderItem.Product.ProductDescription</td>
+                <td data-th="Price">@orderItem.Product.ProductCurrentPrice</td>
+                <td data-th="Quantity">@orderItem.OrderItemQuantity</td>
+                <td data-th="Subtotal" class="text-center">@orderItem.OrderItemTotalPrice</td>
+                <td class="text-center" style="visibility:hidden;">@orderItem.OrderItemId</td>
+                <td class="text-center" style="visibility:hidden;">@orderItem.OrderItemProductId</td>
+                <td class="text-center" style="visibility:hidden;">@orderItem.OrderItemOrderId</td>
+                <td data-th="">
 
-@foreach (var orderItem in Model.OrderItems)
-{
-    <tr>
-        <td data-th="Product">@orderItem.Product.ProductName</td>
-        <td data-th="Description">@orderItem.Product.ProductDescription</td>
-        <td data-th="Price">@orderItem.Product.CurrentPrice</td>
-        <td data-th="Quantity">@orderItem.Quantity</td>
-        <td data-th="Subtotal" class="text-center">@orderItem.Price</td>
-        <td class="text-center" style="visibility:hidden;">@orderItem.ID</td>
-        <td class="text-center" style="visibility:hidden;">@orderItem.ProductId</td>
-        <td data-th="">
-
-            <a href="javascript:void(0)" class="Edit">Edit |</a>
-            <a href="javascript:void(0)" class="Delete">| Remove</a>
+                    <a href="javascript:void(0)" class="Edit">Edit |</a>
+                    <a href="javascript:void(0)" class="Delete"> Remove</a>
 
 
-        </td>
-    </tr>
+                </td>
+            </tr>
 
-}
+        }
+
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Grand Total:</td>
+            <td class="text-center" id="GrandTotal">@Model.OrderTotal</td>
+        </tr>
+    </tfoot>
+</table>

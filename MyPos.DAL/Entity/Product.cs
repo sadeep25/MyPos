@@ -12,7 +12,8 @@ namespace MyPos.DAL.Entity
     {
         [Key]
         [Column(Order = 1)]
-        public int ID { get; set; }
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        public int ProductId { get; set; }
 
         [Required]
         [MaxLength(60)]
@@ -23,10 +24,10 @@ namespace MyPos.DAL.Entity
         public string ProductDescription { get; set; }
 
         [Required]
-        public Decimal CurrentPrice { get; set; }
+        public Decimal ProductCurrentPrice { get; set; }
 
         [Required]
-        public int StockAvailable { get; set; }
+        public int ProductStockAvailable { get; set; }
 
 
 
