@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-
+using AutoMapper;
 namespace MyPos.Web.Controllers
 {
     public class OrderController : Controller
@@ -50,7 +50,8 @@ namespace MyPos.Web.Controllers
         [HttpPost]
         public ActionResult AddNewOrder(OrderStartViewModel orderStartViewModel)
         {
-            Order order = new Order();
+            //Order order = new Order();
+            OrderItemsAddViewModel order = new OrderItemsAddViewModel();
             order.OrderCustomerId = orderStartViewModel.CustomerID;
             order.OrderDate = orderStartViewModel.OrderDate;
 
@@ -78,10 +79,18 @@ namespace MyPos.Web.Controllers
         //Get: Oder Items Add
 
         [HttpGet]
-
-        public ActionResult OrderItemsAdd(Order order)
+        //must be changed
+        public ActionResult OrderItemsAdd(OrderItemsAddViewModel orderItemsAddViewModel)
         {
-            return View(order);
+            //var config = new MapperConfiguration(cfg =>
+            //{
+            //    cfg.CreateMap<OrderStartViewModel, OrderEditViewModel>();
+            //});
+
+            //IMapper mapper = config.CreateMapper();
+
+            //var dest = mapper.Map<OrderStartViewModel, OrderEditViewModel>(orderStartViewModel);
+            return View(orderItemsAddViewModel);
         }
 
 
@@ -89,15 +98,32 @@ namespace MyPos.Web.Controllers
         //Post: Oder Items Add
         [HttpPost]
         [ActionName("OrderItemsAdd")]
-        public ActionResult OrderItemsAddPost(Order order)
+        public ActionResult OrderItemsAddPost(OrderItemsAddViewModel orderItemsAddViewModel)
         {
-            order.OrderShippingAddress = _customerService.GetCustomerByID(order.OrderCustomerId).CustomerAddress;
-            
+            Order order = new Order();
+
+            orderItemsAddViewModel.OrderShippingAddress = _customerService.GetCustomerByID(orderItemsAddViewModel.OrderCustomerId).CustomerAddress;
+
             //this needs to change to a function that checks whether available stocks are enough
             var nextOrderId = _orderService.GetLatestOrderId();
-            order.OrderId = nextOrderId;
-            foreach (var item in order.OrderItems)
+            orderItemsAddViewModel.OrderId = nextOrderId;
+
+            //start
+            //var model = _orderService.GetOrderByID(orderStartViewModel.);
+            //model.OrderItems = _orderItemService.GetListOfOrderItemsByOrderId(Id).ToList();
+
+            var config = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMap<OrderItemsAddViewModel, Order>();
+            });
+
+            IMapper mapper = config.CreateMapper();
+
+            var dest = mapper.Map<OrderItemsAddViewModel, Order>(orderItemsAddViewModel);
+            //end
+            foreach (var item in dest.OrderItems)
+            {
+
                 item.OrderItemOrderId = nextOrderId;
                 try
                 {
@@ -112,8 +138,8 @@ namespace MyPos.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                _orderService.Add(order);
-                
+                _orderService.Add(dest);
+
                 //return RedirectToAction("AddNewOrder");
                 return Json(new
                 {
@@ -157,7 +183,16 @@ namespace MyPos.Web.Controllers
         public ActionResult OrderDetails(int Id)
         {
             var model = _orderService.GetOrderByID(Id);
-            return View(model);
+            model.OrderItems = _orderItemService.GetListOfOrderItemsByOrderId(Id).ToList();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Order, OrderDetailsViewModel>();
+            });
+
+            IMapper mapper = config.CreateMapper();
+
+            var dest = mapper.Map<Order, OrderDetailsViewModel>(model);
+            return View(dest);
         }
 
 
@@ -168,45 +203,84 @@ namespace MyPos.Web.Controllers
         {
             var model = _orderService.GetOrderByID(Id);
             model.OrderItems = _orderItemService.GetListOfOrderItemsByOrderId(Id).ToList();
-            return View(model);
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Order, OrderEditViewModel>();
+            });
+
+            IMapper mapper = config.CreateMapper();
+
+            var dest = mapper.Map<Order, OrderEditViewModel>(model);
+
+            return View(dest);
         }
 
 
 
         [HttpPost]
-
-        public ActionResult OrderEdit(Order order)
+        //must be changed to reflect All the changes
+        public ActionResult OrderEdit(OrderEditViewModel orderEditViewModel)
         {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<OrderEditViewModel, Order>();
+            });
+
+            IMapper mapper = config.CreateMapper();
+
+            var dest = mapper.Map<OrderEditViewModel, Order>(orderEditViewModel);
             if (ModelState.IsValid)
             {
-                _orderService.UpdateOrder(order);
-                return RedirectToAction("OrderDetails", "Order", new { id = order.OrderId });
+                _orderService.UpdateOrder(dest);
+                //return RedirectToAction("OrderDetails", "Order", new { id = dest.OrderId });
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action("OrderDetails", "Order", new { id = orderEditViewModel.OrderId })
+                });
             }
             else
             {
-                return View(order);
+                return Json(new
+
+                {
+                    success = false,
+                    errors = ModelState.Keys.SelectMany(k => ModelState[k].Errors)
+                                .Select(m => m.ErrorMessage).ToArray()
+                });
             }
 
 
 
         }
 
-      
 
-        // POST: tblDepartMents/Delete/5
 
+     
         [HttpPost]
-        public ActionResult DeleteOrderItem(int OrderItemId,int OrderId)
+        public ActionResult DeleteOrderItem(int OrderItemId, int OrderId, int ItemSubTotal)
         {
-            var model = _orderService.GetOrderByID(OrderId);
-            var orderItemList=_orderItemService.DeleteOrderItem(OrderItemId);
-            model.OrderItems = orderItemList.ToList();
-            return PartialView("_OrderItemList", model);
-            //return Json(new
-            //{
-            //    success = true,
 
-            //});
+
+            _orderService.UpdateOrderTotal(OrderId, ItemSubTotal);
+            var model = _orderService.GetOrderByID(OrderId);
+            var orderItemList = _orderItemService.DeleteOrderItem(OrderItemId);
+
+            model.OrderItems = orderItemList.ToList();
+
+            //
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Order, OrderEditViewModel>();
+            });
+
+            IMapper mapper = config.CreateMapper();
+
+            var dest = mapper.Map<Order, OrderEditViewModel>(model);
+            //
+
+            return PartialView("_OrderItemList", dest);
+
         }
 
 

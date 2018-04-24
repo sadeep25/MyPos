@@ -40,6 +40,27 @@ namespace MyPos.DAL.Migrations
                     CustomerEMail = "Mark@gmail.com"
 
                 }
+); context.Products.AddOrUpdate(e => e.ProductName,
+                    new Product
+                    {
+                       ProductName="Anchor",
+                       ProductCurrentPrice=60,
+                       ProductDescription="Milk",
+                       ProductStockAvailable=60
+                    },
+                     new Product
+                     {
+                         ProductName = "Samon",
+                         ProductCurrentPrice = 70,
+                         ProductDescription = "Fish",
+                         ProductStockAvailable = 70
+                     }, new Product
+                     {
+                         ProductName = "Sunlight",
+                         ProductCurrentPrice = 20,
+                         ProductDescription = "Soap",
+                         ProductStockAvailable = 90
+                     }
 );
         }
     }

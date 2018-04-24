@@ -1,4 +1,4 @@
-﻿@model MyPos.DAL.Entity.Order
+﻿@model MyPos.Web.ViewModels.OrderDetailsViewModel
 
 @{
     ViewBag.Title = "OrderDetails";
@@ -51,18 +51,25 @@
 
         @foreach (var i in Model.OrderItems)
         {
-        <tr>
-            <td data-th="Product">@i.Product.ProductName</td>
-            <td data-th="Description">@i.Product.ProductDescription</td>
-            <td data-th="Price">@i.Product.ProductCurrentPrice</td>
-            <td data-th="Quantity">@i.OrderItemQuantity</td>
-            <td data-th="Subtotal" class="text-center">@(i.Product.ProductCurrentPrice*i.OrderItemQuantity)</td>
-            
-        </tr>
+            <tr>
+                <td data-th="Product">@i.Product.ProductName</td>
+                <td data-th="Description">@i.Product.ProductDescription</td>
+                <td data-th="Price">@i.Product.ProductCurrentPrice</td>
+                <td data-th="Quantity">@i.OrderItemQuantity</td>
+                <td data-th="Subtotal" class="text-center">@(i.Product.ProductCurrentPrice * i.OrderItemQuantity)</td>
+
+            </tr>
         }
     </tbody>
     <tfoot>
-       
+        <tr>
+            <td data-th="Product"></td>
+            <td data-th="Description"></td>
+            <td data-th="Price"></td>
+            <td data-th="Quantity">Grand Total</td>
+            <td data-th="Subtotal" class="text-center">@Model.OrderTotal</td>
+        </tr>
+    
     </tfoot>
 </table>
 

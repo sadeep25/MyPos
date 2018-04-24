@@ -1,5 +1,6 @@
 ﻿var GrandTotal = 0;
 $(document).ready(function () {
+    $('#OrderDate').val("");
     var itemsArray = [];
     //setting Jquery DateTimePicker
     $('#OrderDate').datepicker({
@@ -105,7 +106,7 @@ $(document).ready(function () {
                 };
 
                 $.ajax(options).done(function (data) {
-                  
+
                     $("#ProductId").val(data.ProductId);
                     $("#ProductDescription").val(data.ProductDescription);
                     $("#ProductPrice").val(data.ProductCurrentPrice);
@@ -154,7 +155,7 @@ $(document).ready(function () {
 
     $("#AddItem").click(function () {
         var i = $('#ProductId').val();
-        //debugger;
+
         if ($('#ProductId').val() == "") {
             $('#ProductName').focus();
             $('#ProductName').css("border-color", "#ff0000");
@@ -178,39 +179,148 @@ $(document).ready(function () {
     });
     //Save Order To Database
     $('#Save').click(function (e) {
+        var orderDateEntered = $('#OderDateID').val();
+        var customerId = $('#CustomerId').val();
+        var orderTotal = $('#GrandTotal').html();
+        if (orderTotal > 0) {
+            var array = [];
+            var headers = ["OrderItemProductId", "OrderItemQuantity", "OrderItemTotalPrice"];
+            //Reading Customers Shopping Cart Table Values To An Array(Only Product Id, Quantity And SubTotal )
+            $('#myTable .orderItemList').has('td').each(function () {
+                var arrayItem = {};
+                var headersIndex = 0;
+                $('td', $(this)).each(function (index, item) {
+                    if (index == 0 || index == 4 || index == 5) {
+                        arrayItem[headers[headersIndex]] = $(item).html();
+                        headersIndex++;
+                    }
 
+                });
+
+                array.push(arrayItem);
+            });
+
+
+            $.ajax({
+
+                type: "POST",
+                url: "/Order/OrderItemsAdd",
+                data: {
+                    OrderCustomerId: customerId,
+                    OrderDate: orderDateEntered,
+                    OrderItems: array,
+                    OrderTotal: orderTotal
+
+                },
+                success: function (result) {
+
+                    if (result.success) {
+
+                        window.location.href = result.redirectUrl;
+                    } else {
+
+                        for (var error in result.errors) {
+
+                            $('#errorMessages').append(result.errors[error] + '<br />');
+                        }
+                    }
+                },
+
+            });
+
+
+        } else {
+            $('#errorMessages').html("<p>Please Add An Item To Cart</p>");
+        }
+
+
+
+
+    });
+    //Save Edited Order Items
+    $("#EditOrderItem").click(function (e) {
+        var productName = $('#ProductName').val();
+        
+        var GrandTotal = (parseInt($('#GrandTotal').html()) - ItemPrice);
+        debugger;
+        if (productName == "") {
+            $('#ProductName').focus();
+            $('#ProductName').css("border-color", "#ff0000");
+            $('#errorMessages').html("<p>Please Select A Product To Add</p>");
+
+        } else if ($('#ProductQuantity').val() == "" || notValid || $('#ProductQuantity').val() <= "0") {
+            $('#ProductQuantity').focus();
+            $('#ProductQuantity').css("border-color", "#ff0000");
+            $('#errorMessages').html("<p>Please Enter A Valid Quantity</p>");
+        } else {
+            
+            $(SelectedOrdrEditItemRaw).find("td:eq( 0 )").html($('#ProductName').val().toString());
+            $(SelectedOrdrEditItemRaw).find("td:eq( 1 )").html($('#ProductDescription').val().toString());
+            $(SelectedOrdrEditItemRaw).find("td:eq( 2 )").html($('#ProductPrice').val().toString());
+            $(SelectedOrdrEditItemRaw).find("td:eq( 3 )").html($('#ProductQuantity').val().toString());
+            $(SelectedOrdrEditItemRaw).find("td:eq( 4 )").html(($('#ProductPrice').val() * $('#ProductQuantity').val()));
+            $(SelectedOrdrEditItemRaw).find("td:eq( 5 )").html($('#OrderItemId').val().toString());
+            $(SelectedOrdrEditItemRaw).find("td:eq( 6 )").html($('#ProductId').val().toString());
+            debugger
+            //updateting  grandtotal
+            GrandTotal = GrandTotal + parseInt(($('#ProductPrice').val() * $('#ProductQuantity').val()));
+            $('#GrandTotal').html(GrandTotal);
+            $('#isOrderEdited').val('true');
+            debugger;
+            $('#exampleModal').modal('hide');
+            $('.orderLine1 input[type="text"],input[type="number"]').val('');
+        }
+
+
+
+    });
+    $("#EditOrderItemClose").click(function (e) {
+        $('.orderLine1 input[type="text"],input[type="number"]').val('');
+        $('#exampleModal').modal('hide');
+    });
+
+
+});
+
+//Update Edited Item in Database
+$('#UpdateEditedItem').click(function (e) {
+    var xxx = $('#isOrderEdited').val();
+   
+    debugger;
+    if (xxx!="false") {
         var array = [];
-        var headers = ["OrderItemProductId", "OrderItemQuantity", "OrderItemTotalPrice"];
+        var orderId = $('#OrderId').val();
+        var headers = ["OrderItemQuantity", "OrderItemTotalPrice", "OrderItemId", "OrderItemProductId", "OrderItemOrderId"];
         //Reading Customers Shopping Cart Table Values To An Array(Only Product Id, Quantity And SubTotal )
-        $('#myTable .orderItemList').has('td').each(function () {
+        $('#EditOrderItemTable .orderItemList').has('td').each(function () {
             var arrayItem = {};
             var headersIndex = 0;
             $('td', $(this)).each(function (index, item) {
-                if (index == 0 || index == 4 || index == 5) {
+                if (index == 3 || index == 4 || index == 5 || index == 6 || index == 7) {
                     arrayItem[headers[headersIndex]] = $(item).html();
                     headersIndex++;
                 }
 
             });
-
             array.push(arrayItem);
         });
 
 
         var orderDateEntered = $('#OderDateID').val();
         var customerId = $('#CustomerId').val();
+        var orderId = $('#OrderId').val();
         var orderTotal = $('#GrandTotal').html();
         debugger;
         $.ajax({
 
             type: "POST",
-            url: "/Order/OrderItemsAdd",
+            url: "/Order/OrderEdit",
             data: {
+                OrderId: orderId,
                 OrderCustomerId: customerId,
                 OrderDate: orderDateEntered,
                 OrderItems: array,
-                OrderTotal:orderTotal
-
+                OrderTotal: orderTotal
             },
             success: function (result) {
 
@@ -227,185 +337,12 @@ $(document).ready(function () {
             },
 
         });
+    } else {
+        alert("Order Not Modified");
+    }
 
-    });
-    //Save Edited Order Items
-    $("#EditOrderItem").click(function (e) {
-        var productName = $('#ProductName').val();
-
-        if (productName == "") {
-            $('#ProductName').focus();
-            $('#ProductName').css("border-color", "#ff0000");
-            $('#errorMessages').html("<p>Please Select A Product To Add</p>");
-
-        } else if ($('#ProductQuantity').val() == "" || notValid || $('#ProductQuantity').val() <= "0") {
-            $('#ProductQuantity').focus();
-            $('#ProductQuantity').css("border-color", "#ff0000");
-            $('#errorMessages').html("<p>Please Enter A Valid Quantity</p>");
-        } else {
-            var i = $("#EditOrderItemTable td:contains(" + $('#OrderItemId').val() + ")").parents('tr');
-            $(i).find("td:eq( 0 )").html($('#ProductName').val().toString());
-            $(i).find("td:eq( 1 )").html($('#ProductDescription').val().toString());
-            $(i).find("td:eq( 2 )").html($('#ProductPrice').val().toString());
-            $(i).find("td:eq( 3 )").html($('#ProductQuantity').val().toString());
-            $(i).find("td:eq( 4 )").html($('#ProductSubTotal').val().toString());
-            $(i).find("td:eq( 5 )").html($('#OrderItemId').val().toString());
-            $(i).find("td:eq( 6 )").html($('#ProductId').val().toString());
-
-
-            $('#exampleModal').modal('hide');
-            $('.orderLine1 input[type="text"],input[type="number"]').val('');
-        }
-
-
-
-    });
-    $("#EditOrderItemClose").click(function (e) {
-        $('.orderLine1 input[type="text"],input[type="number"]').val('');
-        $('#exampleModal').modal('hide');
-    });
-    //Delete Recent Order Ajax
-    $(".deleteRecentOrder").click(function (e) {
-        var orderId = $(this).parents('tr').find("td:eq( 0 )").html();
-        debugger;
-        var options = {
-            url: "/Order/DeleteOrder",
-            type: "GET",
-            data: { OrderId: orderId,}
-        };
-
-        $.ajax(options).done(function (data) {
-            var $target = $('#recentOrderDiv');
-            var $newHtml = $(data);
-            debugger;
-            $target.replaceWith($newHtml);
-            $newHtml.effect("highlight");
-        });
-        //$.ajax({
-
-        //    type: "GET",
-        //    url: "/Order/DeleteOrder",
-        //    data: {
-        //        OrderId: orderId,
-                
-
-        //    },
-        //    success: function (result) {
-
-        //        if (result.success) {
-
-        //            alert("sucess")
-        //        } else {
-
-        //            for (var error in result.errors) {
-
-        //                $('#errorMessages').append(result.errors[error] + '<br />');
-        //            }
-        //        }
-        //    },
-
-        //});
-    });
 
 });
-
-//Update Edited Item in Database
-$('#UpdateEditedItem').click(function (e) {
-   
-    var array = [];
-    var orderId = $('#OrderId').val();
-    var headers = ["OrderItemQuantity", "OrderItemTotalPrice", "OrderItemId", "OrderItemProductId", "OrderItemOrderId"];
-    //Reading Customers Shopping Cart Table Values To An Array(Only Product Id, Quantity And SubTotal )
-    $('#EditOrderItemTable .orderItemList').has('td').each(function () {
-        var arrayItem = {};
-        var headersIndex = 0;
-        $('td', $(this)).each(function (index, item) {
-            if (index == 3 || index == 4 || index == 5 || index == 6 || index==7) {
-                arrayItem[headers[headersIndex]] = $(item).html();
-                headersIndex++;
-            }
-             
-        });
-        array.push(arrayItem);
-    });
-    
-
-    var orderDateEntered = $('#OderDateID').val();
-    var customerId = $('#CustomerId').val();
-    var orderId = $('#OrderId').val();
-    var orderTotal = $('#GrandTotal').html();
-    debugger;
-    $.ajax({
-
-        type: "POST",
-        url: "/Order/OrderEdit",
-        data: {
-            OrderId: orderId,
-            OrderCustomerId: customerId,
-            OrderDate: orderDateEntered,
-            OrderItems: array,
-            OrderTotal: orderTotal
-        },
-        success: function (result) {
-
-            if (result.success) {
-
-                window.location.href = result.redirectUrl;
-            } else {
-
-                for (var error in result.errors) {
-
-                    $('#errorMessages').append(result.errors[error] + '<br />');
-                }
-            }
-        },
-
-    });
-
-});
-
-//Remove An Ordered Item Ajax
-$(".Delete").click(function (e) {
-    var ItemId = $(this).parents('tr').find("td:eq( 5 )").html();
-    var orderId = $('#OrderId').val();
-    var options = {
-        url: "/Order/DeleteOrderItem",
-        type: "POST",
-        data: {
-            OrderItemId: ItemId,
-            OrderId: orderId}
-    };
-
-    $.ajax(options).done(function (data) {
-        var $target = $('#orderEditItem');
-        var $newHtml = $(data);
-        debugger;
-        $target.replaceWith($newHtml);
-        $newHtml.effect("highlight");
-    });
-    //$(this).parents('tr').first().remove();
-    //$.ajax({
-
-    //    type: "POST",
-    //    url: "/Order/DeleteOrderItem",
-    //    data: {
-    //        OrderItemId: ItemId
-
-
-    //    },
-    //    success: function (result) {
-
-    //        if (result.success) {
-    //            alert("Item Deleted");
-    //        } else {
-
-    //            alert("Item not Deleted");
-    //        }
-    //    },
-
-    //});
-});
-
 
 
 
@@ -421,7 +358,8 @@ $(document).on('click', '.deleteRow', function (e) {
 
 });
 
-
+var ItemPrice;
+var SelectedOrdrEditItemRaw;
 //Edit Ordered Item From Shopping Cart Table
 $(document).on('click', '.Edit', function (e) {
     $('#exampleModal').modal();
@@ -429,7 +367,8 @@ $(document).on('click', '.Edit', function (e) {
     var Quantity = $(this).parents('tr').find("td:eq( 3 )").html();
     var ProductId = $(this).parents('tr').find("td:eq( 6 )").html();
     var OrderItemId = $(this).parents('tr').find("td:eq( 5 )").html();
-
+    SelectedOrdrEditItemRaw = $(this).parents('tr');
+    ItemPrice = $(this).parents('tr').find("td:eq( 4 )").html();
     var options = {
         url: "/Order/GetProductByID",
         type: "POST",
@@ -438,7 +377,7 @@ $(document).on('click', '.Edit', function (e) {
     };
 
     $.ajax(options).done(function (data) {
-       
+
         $("#ProductId").val(data.ProductId);
         $("#ProductName").val(data.ProductName);
         $("#ProductDescription").val(data.ProductDescription);
@@ -450,8 +389,55 @@ $(document).on('click', '.Edit', function (e) {
 
 
     });
-
+    debugger;
 });
 
+$(document).on('click', ".Delete", function (e) {
+    var ItemId = $(this).parents('tr').find("td:eq( 5 )").html();
+    //Change Total
+    var itemSubTotal = parseFloat($(this).parents('tr').find("td:eq( 4 )").html());
 
+    //Change Total
+    var orderId = $('#OrderId').val();
+    var options = {
+        url: "/Order/DeleteOrderItem",
+        type: "POST",
+        data: {
+            OrderItemId: ItemId,
+            OrderId: orderId,
+            ItemSubTotal: itemSubTotal,
+        }
+    };
+    var $target = $('#orderEditItem');
+    debugger;
+    $.ajax(options).done(function (data) {
+        $('#isOrderEdited').val('false');
+        var $newHtml = $(data);
+        debugger;
+        $target.html($newHtml);
+        $newHtml.effect("highlight");
+    });
 
+}
+);
+
+//Delete Recent Order Ajax
+$(document).on('click', ".deleteRecentOrder", function (e) {
+    var orderId = $(this).parents('tr').find("td:eq( 0 )").html();
+
+    var options = {
+        url: "/Order/DeleteOrder",
+        type: "GET",
+        data: { OrderId: orderId, }
+    };
+    var $target = $('#recentOrderDiv');
+    $.ajax(options).done(function (data) {
+        
+        var $newHtml = $(data);
+
+        $target.html($newHtml);
+        $newHtml.effect("highlight");
+    });
+
+}
+);

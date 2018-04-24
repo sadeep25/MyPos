@@ -29,6 +29,13 @@ namespace MyPos.BL.Services
         {
             return unitOfWork.OrderRepository.GetByID(id);
         }
+        public void UpdateOrderTotal(int id,int itemSubTotal)
+        {
+            var editmodel = GetOrderByID(id);
+            editmodel.OrderTotal =(editmodel.OrderTotal-itemSubTotal);
+            unitOfWork.OrderRepository.Update(editmodel);
+            unitOfWork.Save();
+        }
 
         public int GetLatestOrderId()
         {
@@ -89,10 +96,22 @@ namespace MyPos.BL.Services
             var editmodel = GetOrderByID(model.OrderId);
             if (editmodel == null) { throw new MyPosException("No matching Order found!"); }
 
-            editmodel.OrderDate = model.OrderDate;
-            editmodel.OrderItems = model.OrderItems;
-            editmodel.OrderShippingAddress = model.OrderShippingAddress;
-            editmodel.OrderCustomerId = model.OrderCustomerId;
+            //editmodel.OrderDate = model.OrderDate;
+            //editmodel.OrderItems = model.OrderItems;
+            var items = model.OrderItems.ToList();
+            
+            var i=0;
+            foreach (var orderItem in editmodel.OrderItems)
+            {
+                
+                orderItem.OrderItemProductId = items[i].OrderItemProductId;
+                orderItem.OrderItemQuantity = items[i].OrderItemQuantity;
+                orderItem.OrderItemTotalPrice = items[i].OrderItemTotalPrice;
+                i++;
+            }
+            editmodel.OrderTotal = model.OrderTotal;
+            //editmodel.OrderShippingAddress = model.OrderShippingAddress;
+            //editmodel.OrderCustomerId = model.OrderCustomerId;
             unitOfWork.OrderRepository.Update(editmodel);
             unitOfWork.Save();
         }

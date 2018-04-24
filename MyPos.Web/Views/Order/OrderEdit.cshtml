@@ -1,4 +1,4 @@
-﻿@model MyPos.DAL.Entity.Order
+﻿@model MyPos.Web.ViewModels.OrderEditViewModel
 
 @{
     /**/
@@ -7,7 +7,7 @@
 }
 
 <h2>OrderEdit</h2>
-
+<input type="hidden" id="isOrderEdited" value="false" />
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-md" role="document">
@@ -55,7 +55,8 @@
     </div>
 </div>
 <div>
-    <input type="hidden" id="OrderId" value="@Model.OrderId" />
+    <input type="hidden" id="OderDateID" value="@Model.OrderDate" />
+    <input type="hidden" id="CustomerId" value="@Model.OrderCustomer.CustomerId" />
     <input type="hidden" id="OrderId" value="@Model.OrderId" />
 </div>
 <div id="orderEditItem">
