@@ -20,32 +20,30 @@ namespace MyPos.BL.Services
         public IEnumerable<OrderItem> GetListOfOrderItemsByOrderId(int id)
         {
             var orderItemList = (unitOfWork.OrderItemRepository.Get()
-                .Where(x => x.OrderItemIsDeleted != true && x.OrderItemOrderId==id )
+                .Where(x => x.OrderItemIsDeleted != true && x.OrderItemOrderId == id)
                 .Select(r => new OrderItem
                 {
                     OrderItemId = r.OrderItemId,
                     OrderItemProductId = r.OrderItemProductId,
                     OrderItemQuantity = r.OrderItemQuantity,
                     OrderItemTotalPrice = r.OrderItemTotalPrice,
-                    OrderItemOrderId=r.OrderItemOrderId,
-                    Product=r.Product
-                    
+                    OrderItemOrderId = r.OrderItemOrderId,
+                    Product = r.Product
+
 
                 }));
 
 
             return orderItemList;
         }
-            public OrderItem GetOrderItemByID(int id)
+        public OrderItem GetOrderItemByID(int id)
         {
             return unitOfWork.OrderItemRepository.GetByID(id);
         }
 
         public IEnumerable<OrderItem> DeleteOrderItem(int id)
         {
-            //unitOfWork.OrderItemRepository.Delete(id);
-            //unitOfWork.Save();
-            //need to add an exception.
+
             var editmodel = GetOrderItemByID(id);
             editmodel.OrderItemIsDeleted = true;
             unitOfWork.OrderItemRepository.Update(editmodel);

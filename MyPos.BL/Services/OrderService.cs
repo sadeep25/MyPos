@@ -29,10 +29,10 @@ namespace MyPos.BL.Services
         {
             return unitOfWork.OrderRepository.GetByID(id);
         }
-        public void UpdateOrderTotal(int id,int itemSubTotal)
+        public void UpdateOrderTotal(int id, int itemSubTotal)
         {
             var editmodel = GetOrderByID(id);
-            editmodel.OrderTotal =(editmodel.OrderTotal-itemSubTotal);
+            editmodel.OrderTotal = (editmodel.OrderTotal - itemSubTotal);
             unitOfWork.OrderRepository.Update(editmodel);
             unitOfWork.Save();
         }
@@ -40,12 +40,12 @@ namespace MyPos.BL.Services
         public int GetLatestOrderId()
         {
             int nextOrderId;
-            int? currentOrderId  = (unitOfWork.OrderRepository.Get()
+            int? currentOrderId = (unitOfWork.OrderRepository.Get()
                .OrderByDescending(x => x.OrderId)
               .FirstOrDefault()?.OrderId);
             if (currentOrderId == null)
             {
-                nextOrderId = 0;
+                nextOrderId = 1;
             }
             else
             {
@@ -57,7 +57,7 @@ namespace MyPos.BL.Services
         public IEnumerable<Order> GetRecentOrders()
         {
             var orderList = (unitOfWork.OrderRepository.Get()
-                .Where(x=>x.OrderIsDeleted!=true)
+                .Where(x => x.OrderIsDeleted != true)
                 .OrderByDescending(x => x.OrderId)
                 .Select(r => new Order
                 {
@@ -65,7 +65,7 @@ namespace MyPos.BL.Services
                     OrderId = r.OrderId,
                     OrderDate = r.OrderDate,
                     OrderShippingAddress = r.OrderShippingAddress,
-                    OrderTotal=r.OrderTotal
+                    OrderTotal = r.OrderTotal
                 })).Take(5);
 
 
@@ -75,14 +75,12 @@ namespace MyPos.BL.Services
         public int GetLatestOrderIDFromCustomerID(int id)
         {
             var orderId = unitOfWork.OrderRepository.Get()
-                .Where(r => r.OrderCustomerId == id && r.OrderIsDeleted!=true).OrderByDescending(x => x.OrderId).FirstOrDefault().OrderId;
+                .Where(r => r.OrderCustomerId == id && r.OrderIsDeleted != true).OrderByDescending(x => x.OrderId).FirstOrDefault().OrderId;
             return orderId;
         }
 
         public void DeleteOrder(int id)
         {
-            //unitOfWork.OrderRepository.Delete(id);
-            //unitOfWork.Save();
             var editmodel = GetOrderByID(id);
             editmodel.OrderIsDeleted = true;
             unitOfWork.OrderRepository.Update(editmodel);
@@ -96,22 +94,21 @@ namespace MyPos.BL.Services
             var editmodel = GetOrderByID(model.OrderId);
             if (editmodel == null) { throw new MyPosException("No matching Order found!"); }
 
-            //editmodel.OrderDate = model.OrderDate;
-            //editmodel.OrderItems = model.OrderItems;
             var items = model.OrderItems.ToList();
-            
-            var i=0;
+
+            var i = 0;
             foreach (var orderItem in editmodel.OrderItems)
             {
-                
-                orderItem.OrderItemProductId = items[i].OrderItemProductId;
-                orderItem.OrderItemQuantity = items[i].OrderItemQuantity;
-                orderItem.OrderItemTotalPrice = items[i].OrderItemTotalPrice;
-                i++;
+                if (orderItem.OrderItemIsDeleted == false)
+                {
+                    orderItem.OrderItemProductId = items[i].OrderItemProductId;
+                    orderItem.OrderItemQuantity = items[i].OrderItemQuantity;
+                    orderItem.OrderItemTotalPrice = items[i].OrderItemTotalPrice;
+                    i++;
+                }
+
             }
             editmodel.OrderTotal = model.OrderTotal;
-            //editmodel.OrderShippingAddress = model.OrderShippingAddress;
-            //editmodel.OrderCustomerId = model.OrderCustomerId;
             unitOfWork.OrderRepository.Update(editmodel);
             unitOfWork.Save();
         }

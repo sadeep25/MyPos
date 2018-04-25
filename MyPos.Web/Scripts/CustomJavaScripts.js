@@ -242,7 +242,7 @@ $(document).ready(function () {
         var productName = $('#ProductName').val();
         
         var GrandTotal = (parseInt($('#GrandTotal').html()) - ItemPrice);
-        debugger;
+        
         if (productName == "") {
             $('#ProductName').focus();
             $('#ProductName').css("border-color", "#ff0000");
@@ -266,7 +266,7 @@ $(document).ready(function () {
             GrandTotal = GrandTotal + parseInt(($('#ProductPrice').val() * $('#ProductQuantity').val()));
             $('#GrandTotal').html(GrandTotal);
             $('#isOrderEdited').val('true');
-            debugger;
+            
             $('#exampleModal').modal('hide');
             $('.orderLine1 input[type="text"],input[type="number"]').val('');
         }
@@ -285,8 +285,8 @@ $(document).ready(function () {
 //Update Edited Item in Database
 $('#UpdateEditedItem').click(function (e) {
     var xxx = $('#isOrderEdited').val();
+    var orderId = $('#OrderId').val();
    
-    debugger;
     if (xxx!="false") {
         var array = [];
         var orderId = $('#OrderId').val();
@@ -310,7 +310,7 @@ $('#UpdateEditedItem').click(function (e) {
         var customerId = $('#CustomerId').val();
         var orderId = $('#OrderId').val();
         var orderTotal = $('#GrandTotal').html();
-        debugger;
+       
         $.ajax({
 
             type: "POST",
@@ -338,7 +338,8 @@ $('#UpdateEditedItem').click(function (e) {
 
         });
     } else {
-        alert("Order Not Modified");
+        window.location.href = "../OrderDetails/" + orderId;
+        
     }
 
 
@@ -349,10 +350,7 @@ $('#UpdateEditedItem').click(function (e) {
 //Remove Ordered Item From Shopping Cart Table 
 $(document).on('click', '.deleteRow', function (e) {
 
-    //var r = parseInt($(this).parents('tr').find("td:eq( 5 )").html());
-    //var GrandTotal = parseInt($('#GrandTotal').html());
     GrandTotal = GrandTotal - parseInt($(this).parents('tr').find("td:eq( 5 )").html());
-
     $('#GrandTotal').html(GrandTotal.toString());
     $(this).parents('tr').first().remove();
 
@@ -389,7 +387,7 @@ $(document).on('click', '.Edit', function (e) {
 
 
     });
-    debugger;
+   
 });
 
 $(document).on('click', ".Delete", function (e) {
@@ -409,11 +407,11 @@ $(document).on('click', ".Delete", function (e) {
         }
     };
     var $target = $('#orderEditItem');
-    debugger;
+   
     $.ajax(options).done(function (data) {
         $('#isOrderEdited').val('false');
         var $newHtml = $(data);
-        debugger;
+     
         $target.html($newHtml);
         $newHtml.effect("highlight");
     });

@@ -1,12 +1,40 @@
 ﻿@model MyPos.Web.ViewModels.OrderEditViewModel
 
 @{
-    /**/
 
     ViewBag.Title = "OrderEdit";
 }
 
 <h2>OrderEdit</h2>
+<div>
+
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.OrderCustomer.CustomerName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OrderCustomer.CustomerName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.OrderDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OrderDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OrderShippingAddress)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OrderShippingAddress)
+        </dd>
+
+    </dl>
+</div>
 <input type="hidden" id="isOrderEdited" value="false" />
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -63,9 +91,6 @@
     @Html.Partial("_OrderItemList", Model)
 
 </div>
-
-
-
 <div>
     <button type="button" class="btn btn-primary" id="UpdateEditedItem"> Update Order</button>
 </div>

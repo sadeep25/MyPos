@@ -9,6 +9,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using AutoMapper;
+using MyPos.Web.ErrorHandlers;
+
 namespace MyPos.Web.Controllers
 {
     public class OrderController : Controller
@@ -80,16 +82,10 @@ namespace MyPos.Web.Controllers
 
         [HttpGet]
         //must be changed
+        [Test]
         public ActionResult OrderItemsAdd(OrderItemsAddViewModel orderItemsAddViewModel)
         {
-            //var config = new MapperConfiguration(cfg =>
-            //{
-            //    cfg.CreateMap<OrderStartViewModel, OrderEditViewModel>();
-            //});
-
-            //IMapper mapper = config.CreateMapper();
-
-            //var dest = mapper.Map<OrderStartViewModel, OrderEditViewModel>(orderStartViewModel);
+            //throw new OrderNotFoundException();
             return View(orderItemsAddViewModel);
         }
 
@@ -104,13 +100,9 @@ namespace MyPos.Web.Controllers
 
             orderItemsAddViewModel.OrderShippingAddress = _customerService.GetCustomerByID(orderItemsAddViewModel.OrderCustomerId).CustomerAddress;
 
-            //this needs to change to a function that checks whether available stocks are enough
+            //Getting Next OrderId
             var nextOrderId = _orderService.GetLatestOrderId();
             orderItemsAddViewModel.OrderId = nextOrderId;
-
-            //start
-            //var model = _orderService.GetOrderByID(orderStartViewModel.);
-            //model.OrderItems = _orderItemService.GetListOfOrderItemsByOrderId(Id).ToList();
 
             var config = new MapperConfiguration(cfg =>
             {
@@ -127,7 +119,7 @@ namespace MyPos.Web.Controllers
                 item.OrderItemOrderId = nextOrderId;
                 try
                 {
-                    _productService.UpdatProductQuantityr(_productService.GetProductByID(item.OrderItemProductId), item.OrderItemQuantity);
+                    _productService.UpdatProductQuantity(_productService.GetProductByID(item.OrderItemProductId), item.OrderItemQuantity);
                 }
                 catch (MyPosException exp)
                 {
@@ -140,7 +132,6 @@ namespace MyPos.Web.Controllers
             {
                 _orderService.Add(dest);
 
-                //return RedirectToAction("AddNewOrder");
                 return Json(new
                 {
                     success = true,
@@ -156,7 +147,6 @@ namespace MyPos.Web.Controllers
                                 .Select(m => m.ErrorMessage).ToArray()
             });
         }
-
 
 
         //Oder Item Add AJAX requests
@@ -191,8 +181,8 @@ namespace MyPos.Web.Controllers
 
             IMapper mapper = config.CreateMapper();
 
-            var dest = mapper.Map<Order, OrderDetailsViewModel>(model);
-            return View(dest);
+            var order = mapper.Map<Order, OrderDetailsViewModel>(model);
+            return View(order);
         }
 
 
@@ -210,15 +200,15 @@ namespace MyPos.Web.Controllers
 
             IMapper mapper = config.CreateMapper();
 
-            var dest = mapper.Map<Order, OrderEditViewModel>(model);
+            var order = mapper.Map<Order, OrderEditViewModel>(model);
 
-            return View(dest);
+            return View(order);
         }
 
 
 
         [HttpPost]
-        //must be changed to reflect All the changes
+
         public ActionResult OrderEdit(OrderEditViewModel orderEditViewModel)
         {
             var config = new MapperConfiguration(cfg =>
@@ -232,7 +222,7 @@ namespace MyPos.Web.Controllers
             if (ModelState.IsValid)
             {
                 _orderService.UpdateOrder(dest);
-                //return RedirectToAction("OrderDetails", "Order", new { id = dest.OrderId });
+
                 return Json(new
                 {
                     success = true,
@@ -254,15 +244,15 @@ namespace MyPos.Web.Controllers
 
         }
 
-
-
-     
         [HttpPost]
         public ActionResult DeleteOrderItem(int OrderItemId, int OrderId, int ItemSubTotal)
         {
 
 
             _orderService.UpdateOrderTotal(OrderId, ItemSubTotal);
+            var returnedProductId = _orderItemService.GetOrderItemByID(OrderItemId).OrderItemProductId;
+            var returnedProductQuantity = _orderItemService.GetOrderItemByID(OrderItemId).OrderItemQuantity;
+            _productService.UpdateProductReturnedQuantity(returnedProductId, returnedProductQuantity);
             var model = _orderService.GetOrderByID(OrderId);
             var orderItemList = _orderItemService.DeleteOrderItem(OrderItemId);
 
@@ -284,18 +274,15 @@ namespace MyPos.Web.Controllers
         }
 
 
-
         [HttpGet]
         public ActionResult DeleteOrder(int OrderId)
         {
-            //_orderItemService.DeleteOrderItem(OrderItemId);
             _orderService.DeleteOrder(OrderId);
             OrderStartViewModel orderStartViewModel = new OrderStartViewModel();
 
             orderStartViewModel.RecentOrders = _orderService.GetRecentOrders();
 
             return PartialView("_RecentOrders", orderStartViewModel);
-
 
         }
 
