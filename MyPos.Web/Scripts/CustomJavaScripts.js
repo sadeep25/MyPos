@@ -225,7 +225,7 @@ $(document).ready(function () {
 
         } else if (total > 5000) {
 
-            $('#errorMessages').html("<p>Grand Total Must Be Less Than 1000.00 Rs To Make The Order </p>");
+            $('#errorMessages').html("<p>Grand Total Must Be Less Than 5000 Rs To Make The Order </p>");
 
         } else {
 
@@ -444,7 +444,6 @@ $('#UpdateEditedItem').click(function (e) {
 
 
 });
-
 
 
 //Remove Ordered Item From Shopping Cart Table 

@@ -102,7 +102,7 @@ namespace MyPos.BL.Services
 
             return nextOrderId;
         }
-        //new
+     
         public IEnumerable<Order> GetRecentOrders()
         {
             var orderList = (unitOfWork.OrderRepository.Get()
@@ -120,7 +120,6 @@ namespace MyPos.BL.Services
             return orderList;
         }
 
-
         public int GetLatestOrderIDFromCustomerID(int id)
         {
             var order = unitOfWork.OrderRepository.Get()
@@ -135,7 +134,6 @@ namespace MyPos.BL.Services
 
             return order.OrderId;
         }
-
 
         public void DeleteOrder(int id)
         {

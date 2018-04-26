@@ -27,6 +27,7 @@ namespace MyPos.DAL.Entity
 
         public bool OrderIsDeleted { get; set; }
 
+
         public virtual ICollection<OrderItem> OrderItems { get; set; }
 
         [ForeignKey("OrderCustomerId")]
