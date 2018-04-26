@@ -17,7 +17,7 @@ namespace MyPos.DAL.Entity
 
         public int OrderItemQuantity { get; set; }
         
-        public decimal OrderItemTotalPrice { get; set; }
+        public int OrderItemTotalPrice { get; set; }
 
         public bool OrderItemIsDeleted { get; set; }
 
@@ -29,6 +29,7 @@ namespace MyPos.DAL.Entity
 
         [ForeignKey("OrderItemProductId")]
         public virtual Product Product { get; set; }
+
         [ForeignKey("OrderItemOrderId")]
         public virtual Order Order { get; set; }
     }

@@ -12,10 +12,16 @@ namespace MyPos.Web.ViewModels
     {
 
         public int OrderId { get; set; }
+
         public int OrderCustomerId { get; set; }
+
         public string OrderShippingAddress { get; set; }
+
         public DateTime OrderDate { get; set; }
+
         public int OrderTotal { get; set; }
+
+
         public virtual ICollection<OrderItem> OrderItems { get; set; }
 
     }

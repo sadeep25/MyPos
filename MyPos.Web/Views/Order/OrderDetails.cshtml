@@ -7,7 +7,6 @@
 <h2>OrderDetails</h2>
 
 <div>
-  
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -32,7 +31,6 @@
         <dd>
             @Html.DisplayFor(model => model.OrderShippingAddress)
         </dd>
-
     </dl>
 </div>
 
@@ -48,7 +46,6 @@
         </tr>
     </thead>
     <tbody>
-
         @foreach (var i in Model.OrderItems)
         {
             <tr>
@@ -57,7 +54,6 @@
                 <td data-th="Price">@i.Product.ProductCurrentPrice</td>
                 <td data-th="Quantity">@i.OrderItemQuantity</td>
                 <td data-th="Subtotal" class="text-center">@(i.Product.ProductCurrentPrice * i.OrderItemQuantity)</td>
-
             </tr>
         }
     </tbody>
@@ -69,7 +65,6 @@
             <td data-th="Quantity">Grand Total</td>
             <td data-th="Subtotal" class="text-center">@Model.OrderTotal</td>
         </tr>
-    
     </tfoot>
 </table>
 

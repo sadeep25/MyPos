@@ -47,8 +47,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\CustomerNotFoundException.cs" />
+    <Compile Include="Exceptions\MyPosDbException.cs" />
     <Compile Include="Exceptions\MyPosException.cs" />
+    <Compile Include="Exceptions\OrderItemNotFoundException.cs" />
     <Compile Include="Exceptions\OrderNotFoundException.cs" />
+    <Compile Include="Exceptions\ProductNotFoundException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CustomerService.cs" />
     <Compile Include="Services\OrderItemService.cs" />

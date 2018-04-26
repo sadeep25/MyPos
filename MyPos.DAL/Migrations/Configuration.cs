@@ -39,8 +39,7 @@ namespace MyPos.DAL.Migrations
                     CustomerAddress = "Negambo",
                     CustomerEMail = "Mark@gmail.com"
 
-                }
-);
+                });
             context.Products.AddOrUpdate(e => e.ProductName,
                     new Product
                     {
@@ -61,8 +60,7 @@ namespace MyPos.DAL.Migrations
                          ProductCurrentPrice = 20,
                          ProductDescription = "Soap",
                          ProductStockAvailable = 90
-                     }
-                    );
+                     });
         }
     }
 }

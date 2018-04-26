@@ -1,15 +1,11 @@
 ﻿@model MyPos.Web.ViewModels.OrderItemsAddViewModel
 
-
-
-
 <div>
-    <h3>Add Items To Cart :</h3>
+    <h4>Add Items To Cart :</h4>
     <div id="errorMessages" class="alert-danger"></div>
     <hr />
     <input type="hidden" name="name" value="@Model.OrderDate" id="OderDateID" />
     <input type="hidden" name="name" value="@Model.OrderCustomerId" id="CustomerId" />
-
     <table id="ProductSelect" class="table orderLine1 ">
         <thead>
             <tr>
@@ -40,12 +36,9 @@
             </tr>
         </tbody>
         <tfoot>
-
         </tfoot>
     </table>
     <hr />
-
-
     <table id="myTable" class="table ">
         <thead>
             <tr>
@@ -60,11 +53,11 @@
         <tbody></tbody>
         <tfoot>
             <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td data-th="Quantity">Grand Total :</td>
-            <td id="GrandTotal" data-th="Subtotal" class="text-center"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td data-th="Quantity">Grand Total :</td>
+                <td id="GrandTotal" data-th="Subtotal" class="text-center"></td>
             </tr>
         </tfoot>
     </table>

@@ -1,6 +1,6 @@
 ﻿@model MyPos.Web.ViewModels.OrderStartViewModel
 
-<h2>New Order</h2>
+<h4>Add A New Order</h4>
 
 
 @using (Html.BeginForm())
@@ -38,12 +38,6 @@
 <div id="recentOrderDiv">
     @Html.Partial("_RecentOrders", Model)
 </div>
-       
-  
-
-
-
-
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/jqueryui")

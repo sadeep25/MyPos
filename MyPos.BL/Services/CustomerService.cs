@@ -3,6 +3,8 @@ using MyPos.DAL.Entity;
 using MyPos.DAL.Repository;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,14 +22,38 @@ namespace MyPos.BL.Services
 
         public void Add(Customer model)
         {
-            if (model == null) { throw new MyPosException("Model can not be null !"); }
-            unitOfWork.CustomerRepository.Insert(model);
-            unitOfWork.Save();
+            if (model == null) { throw new CustomerNotFoundException(); }
+
+            try
+            {
+                unitOfWork.CustomerRepository.Insert(model);
+
+                unitOfWork.Save();
+            }
+            catch (DbUpdateException ex)
+            {
+                var sqlException = ex.GetBaseException() as SqlException;
+
+                if (sqlException != null && sqlException.Number == 547)
+                {
+                    throw new MyPosDbException("Operation Could Not Carry Out Due To An Database Error", ex);
+                }
+                   
+                throw ex;
+            }
+           
         }
 
         public Customer GetCustomerByID(int id)
         {
-            return unitOfWork.CustomerRepository.GetByID(id);
+            var customer = unitOfWork.CustomerRepository.GetByID(id);
+
+            if (customer==null)
+            {
+                throw new CustomerNotFoundException();
+            }
+
+            return customer;
         }
 
         public IEnumerable<Customer> GetCustomerAutoCompleteList(string searchKey)
@@ -39,21 +65,41 @@ namespace MyPos.BL.Services
                          CustomerId = r.CustomerId,
                          CustomerName = r.CustomerName
                      }));
+
             return model;
         }
 
         public virtual void UpdateCustomer(Customer model)
         {
-            if (model == null) { throw new MyPosException("Model can not be null !"); }
+            if (model == null) { throw new CustomerNotFoundException(); }
+
             var editmodel = GetCustomerByID(model.CustomerId);
-            if (editmodel == null) { throw new MyPosException("No matching Customer found!"); }
+
+            if (editmodel == null) { throw new CustomerNotFoundException(); }
 
             editmodel.CustomerName = model.CustomerName;
+
             editmodel.CustomerEMail = model.CustomerEMail;
+
             editmodel.CustomerAddress = model.CustomerAddress;
 
-            unitOfWork.CustomerRepository.Update(editmodel);
-            unitOfWork.Save();
+            try
+            {
+                unitOfWork.CustomerRepository.Update(editmodel);
+
+                unitOfWork.Save();
+            }
+            catch (DbUpdateException ex)
+            {
+                var sqlException = ex.GetBaseException() as SqlException;
+
+                if (sqlException != null && sqlException.Number == 547)
+                {
+                    throw new MyPosDbException("Operation Could Not Carry Out Due To An Database Error", ex);
+                }
+                   
+                throw ex;
+            }
         }
 
     }

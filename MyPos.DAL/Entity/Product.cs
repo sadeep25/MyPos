@@ -24,7 +24,7 @@ namespace MyPos.DAL.Entity
         public string ProductDescription { get; set; }
 
         [Required]
-        public Decimal ProductCurrentPrice { get; set; }
+        public int ProductCurrentPrice { get; set; }
 
         [Required]
         public int ProductStockAvailable { get; set; }

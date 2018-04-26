@@ -153,7 +153,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\OrderController.cs" />
-    <Compile Include="ErrorHandlers\Test.cs" />
+    <Compile Include="ErrorHandlers\MyPosErrorHandler.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -162,7 +162,6 @@
     <Compile Include="ViewModels\OrderEditViewModel.cs" />
     <Compile Include="ViewModels\OrderItemsAddViewModel.cs" />
     <Compile Include="ViewModels\OrderStartViewModel.cs" />
-    <Compile Include="ViewModels\SingleItemViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
@@ -241,7 +240,6 @@
     </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Order\AddNewOrder.cshtml" />
     <Content Include="Views\Order\OrderItemsAdd.cshtml" />
@@ -249,7 +247,7 @@
     <Content Include="Views\Order\OrderEdit.cshtml" />
     <Content Include="Views\Order\_OrderItemList.cshtml" />
     <Content Include="Views\Order\_RecentOrders.cshtml" />
-    <Content Include="Views\Shared\Error1.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

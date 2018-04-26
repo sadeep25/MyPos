@@ -29,6 +29,7 @@ namespace MyPos.DAL.Repository
                 return customerRepository;
             }
         }
+
         public GenericRepository<Order> OrderRepository
         {
             get
@@ -40,6 +41,7 @@ namespace MyPos.DAL.Repository
                 return orderRepository;
             }
         }
+
         public GenericRepository<Product> ProductRepository
         {
             get
@@ -51,6 +53,7 @@ namespace MyPos.DAL.Repository
                 return productRepository;
             }
         }
+
         public GenericRepository<OrderItem> OrderItemRepository
         {
             get
@@ -62,6 +65,7 @@ namespace MyPos.DAL.Repository
                 return orderItemRepository;
             }
         }
+
         public MyPosDbContext DbContext
         {
             get { return context; }

@@ -24,6 +24,7 @@ namespace MyPos.DAL.Entity
         public int OrderCustomerId { get; set; }
 
         public int OrderTotal { get; set; }
+
         public bool OrderIsDeleted { get; set; }
 
         public virtual ICollection<OrderItem> OrderItems { get; set; }
