@@ -20,30 +20,6 @@ namespace MyPos.BL.Services
             this.unitOfWork = unitOfWork;
         }
 
-        public void Add(Customer model)
-        {
-            if (model == null) { throw new CustomerNotFoundException(); }
-
-            try
-            {
-                unitOfWork.CustomerRepository.Insert(model);
-
-                unitOfWork.Save();
-            }
-            catch (DbUpdateException ex)
-            {
-                var sqlException = ex.GetBaseException() as SqlException;
-
-                if (sqlException != null && sqlException.Number == 547)
-                {
-                    throw new MyPosDbException("Operation Could Not Carry Out Due To An Database Error", ex);
-                }
-                   
-                throw ex;
-            }
-           
-        }
-
         public Customer GetCustomerByID(int id)
         {
             var customer = unitOfWork.CustomerRepository.GetByID(id);
@@ -58,49 +34,26 @@ namespace MyPos.BL.Services
 
         public IEnumerable<Customer> GetCustomerAutoCompleteList(string searchKey)
         {
-            var model = (unitOfWork.CustomerRepository.Get()
+            var customerList = (unitOfWork.CustomerRepository.Get()
                   .Where(r => r.CustomerName.StartsWith(searchKey, StringComparison.InvariantCultureIgnoreCase))
                      .Select(r => new Customer
                      {
                          CustomerId = r.CustomerId,
                          CustomerName = r.CustomerName
                      }));
-
-            return model;
+            if (customerList.Count()==0)
+            {
+                customerList = customerList.Concat(new Customer[] { new Customer() { CustomerId = -1, CustomerName = "There Is No Such A Customer In Database" } });
+                return customerList;
+            }
+            else
+            {
+                return customerList;
+            }
+         
         }
 
-        public virtual void UpdateCustomer(Customer model)
-        {
-            if (model == null) { throw new CustomerNotFoundException(); }
-
-            var editmodel = GetCustomerByID(model.CustomerId);
-
-            if (editmodel == null) { throw new CustomerNotFoundException(); }
-
-            editmodel.CustomerName = model.CustomerName;
-
-            editmodel.CustomerEMail = model.CustomerEMail;
-
-            editmodel.CustomerAddress = model.CustomerAddress;
-
-            try
-            {
-                unitOfWork.CustomerRepository.Update(editmodel);
-
-                unitOfWork.Save();
-            }
-            catch (DbUpdateException ex)
-            {
-                var sqlException = ex.GetBaseException() as SqlException;
-
-                if (sqlException != null && sqlException.Number == 547)
-                {
-                    throw new MyPosDbException("Operation Could Not Carry Out Due To An Database Error", ex);
-                }
-                   
-                throw ex;
-            }
-        }
+      
 
     }
 }

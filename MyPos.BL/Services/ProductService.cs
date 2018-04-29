@@ -41,8 +41,16 @@ namespace MyPos.BL.Services
                          ProductId = r.ProductId,
                          ProductName = r.ProductName
                      }));
-
-            return productList;
+            if (productList.Count() == 0)
+            {
+                productList = productList.Concat(new Product[] { new Product() { ProductId = -1, ProductName = "There Is No Such A Product In Database" } });
+                return productList;
+            }
+            else
+            {
+                return productList;
+            }
+            
         }
 
         public void UpdateProductReturnedQuantity(int productId, int returnedQuantity)
@@ -76,40 +84,32 @@ namespace MyPos.BL.Services
 
         }
 
-        public virtual void UpdatProductQuantity(Product product, int quantitySold)
-        {
-            if (product == null) { throw new MyPosException("Model can not be null !"); }
-
-            var editmodel = GetProductByID(product.ProductId);
-
+        public virtual void UpdatProductQuantity(int productId, int quantitySold)
+        {          
+            var editmodel = GetProductByID(productId);
             if (editmodel == null) { throw new MyPosException("No matching Order found!"); }
-
             if (editmodel.ProductStockAvailable >= quantitySold)
             {
-                editmodel.ProductStockAvailable = (editmodel.ProductStockAvailable - quantitySold);
+                editmodel.ProductStockAvailable = (editmodel.ProductStockAvailable - quantitySold); try
+                {
+                    unitOfWork.ProductRepository.Update(editmodel);
+                    unitOfWork.Save();
+                }
+                catch (DbUpdateException ex)
+                {
+                    var sqlException = ex.GetBaseException() as SqlException;
+                    if (sqlException != null && sqlException.Number == 547)
+                    {
+                        throw new MyPosDbException("Opps An Database Error While Making The Order", ex);
+                    }
+                   throw ex;
+                }
             }
             else
             {
-                { throw new MyPosException("There not enough stock available to make this "); }
+                { throw new ProductOutOfStockException("There not enough "+editmodel.ProductName+" stock available to make this order "); }
             }
-            try
-            {
-                unitOfWork.ProductRepository.Update(editmodel);
-
-                unitOfWork.Save();
-            }
-            catch (DbUpdateException ex)
-            {
-                var sqlException = ex.GetBaseException() as SqlException;
-
-                if (sqlException != null && sqlException.Number == 547)
-                {
-                    throw new MyPosDbException("Deleting Order Item Could Not Carry Out Due To An Database Error", ex);
-                }
-
-                throw ex;
-            }
-
+           
         }
 
     }

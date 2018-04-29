@@ -17,11 +17,12 @@ namespace MyPos.Web.Controllers
     public class OrderController : Controller
     {
         //Declaring Service Variables
-        private readonly CustomerService _customerService;
+
 
         private readonly OrderService _orderService;
 
-        private readonly ProductService _productService;
+        private readonly CustomerService _customerService;
+
 
         private readonly OrderItemService _orderItemService;
 
@@ -37,7 +38,7 @@ namespace MyPos.Web.Controllers
 
             this._orderService = new OrderService(unitOfWork);
 
-            this._productService = new ProductService(unitOfWork);
+
 
             this._orderItemService = new OrderItemService(unitOfWork);
 
@@ -79,14 +80,7 @@ namespace MyPos.Web.Controllers
 
 
 
-        //Add New Order AJAX Requests
-        [HttpPost]
-        public ActionResult CustomerAutocomplete(string searchKey)
-        {
-            var model = _customerService.GetCustomerAutoCompleteList(searchKey);
 
-            return Json(model, JsonRequestBehavior.AllowGet);
-        }
 
         //Get: Oder Items Add
         [HttpGet]
@@ -102,111 +96,60 @@ namespace MyPos.Web.Controllers
         [ActionName("OrderItemsAdd")]
         public ActionResult OrderItemsAddPost(OrderItemsAddViewModel orderItemsAddViewModel)
         {
-            Order order = new Order();
-
-            orderItemsAddViewModel.OrderShippingAddress = _customerService.GetCustomerByID(orderItemsAddViewModel.OrderCustomerId).CustomerAddress;
-
-            //Getting Next OrderId
-            var nextOrderId = _orderService.GetLatestOrderId();
-
-            orderItemsAddViewModel.OrderId = nextOrderId;
-
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<OrderItemsAddViewModel, Order>();
             });
-
             IMapper mapper = config.CreateMapper();
-
             var dest = mapper.Map<OrderItemsAddViewModel, Order>(orderItemsAddViewModel);
-
-            foreach (var item in dest.OrderItems)
+            try
             {
-
-                item.OrderItemOrderId = nextOrderId;
-                try
-                {
-                    _productService.UpdatProductQuantity(_productService.GetProductByID(item.OrderItemProductId), item.OrderItemQuantity);
-                }
-                catch (MyPosException exp)
-                {
-                    ModelState.AddModelError("error", exp.Message);
-                }
-
-            }
-
-            if (ModelState.IsValid)
-            {
-                _orderService.Add(dest);
-
+                var orderId = _orderService.Add(dest);
                 return Json(new
                 {
                     success = true,
-                    redirectUrl = Url.Action("OrderDetails", "Order", new { id = nextOrderId })
+                    redirectUrl = Url.Action("OrderDetails", "Order", new { id = orderId })
+                });
+               
+            }catch(ProductOutOfStockException ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    errors = new {ex.Message}
                 });
             }
-
-            return Json(new
-
-            {
-                success = false,
-                errors = ModelState.Keys.SelectMany(k => ModelState[k].Errors)
-                                .Select(m => m.ErrorMessage).ToArray()
-            });
+          
+          
         }
 
-        //Oder Item Add AJAX requests
-        [HttpPost]
-        public ActionResult ProductAutocompleteList(string searchKey)
-        {
-            var model = _productService.GetProductAutoCompleteList(searchKey);
+    
 
-            return Json(model, JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpPost]
-        public ActionResult GetProductByID(int id)
-        {
-            var model = _productService.GetProductByID(id);
-
-            return Json(model, JsonRequestBehavior.AllowGet);
-        }
 
         [HttpGet]
-        public ActionResult OrderDetails(int Id)
+        public ActionResult OrderDetails(int id=0)
         {
-            var model = _orderService.GetOrderByID(Id);
-
-            model.OrderItems = _orderItemService.GetListOfOrderItemsByOrderId(Id).ToList();
-
+            var model = _orderService.GetOrderByID1(id);
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Order, OrderDetailsViewModel>();
             });
-
             IMapper mapper = config.CreateMapper();
-
             var order = mapper.Map<Order, OrderDetailsViewModel>(model);
-
             return View(order);
         }
 
         [HttpGet]
-        public ActionResult OrderEdit(int Id)
+        public ActionResult OrderEdit(int id=0)
         {
-            var model = _orderService.GetOrderByID(Id);
-
-            model.OrderItems = _orderItemService.GetListOfOrderItemsByOrderId(Id).ToList();
-
+            var model = _orderService.GetOrderByID1(id);
+           
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Order, OrderEditViewModel>();
             });
-
             IMapper mapper = config.CreateMapper();
-
             var order = mapper.Map<Order, OrderEditViewModel>(model);
-
             return View(order);
         }
 
@@ -217,15 +160,13 @@ namespace MyPos.Web.Controllers
             {
                 cfg.CreateMap<OrderEditViewModel, Order>();
             });
-
             IMapper mapper = config.CreateMapper();
-
             var dest = mapper.Map<OrderEditViewModel, Order>(orderEditViewModel);
+
 
             if (ModelState.IsValid)
             {
-                _orderService.UpdateOrder(dest);
-
+                _orderService.UpdateOrder(dest); 
                 return Json(new
                 {
                     success = true,
@@ -235,7 +176,6 @@ namespace MyPos.Web.Controllers
             else
             {
                 return Json(new
-
                 {
                     success = false,
                     errors = ModelState.Keys.SelectMany(k => ModelState[k].Errors)
@@ -244,43 +184,16 @@ namespace MyPos.Web.Controllers
             }
         }
 
-        [HttpPost]
-        public ActionResult DeleteOrderItem(int OrderItemId, int OrderId, int ItemSubTotal)
-        {
-            _orderService.UpdateOrderTotal(OrderId, ItemSubTotal);
 
-            var returnedProductId = _orderItemService.GetOrderItemByID(OrderItemId).OrderItemProductId;
-
-            var returnedProductQuantity = _orderItemService.GetOrderItemByID(OrderItemId).OrderItemQuantity;
-
-            _productService.UpdateProductReturnedQuantity(returnedProductId, returnedProductQuantity);
-
-            var model = _orderService.GetOrderByID(OrderId);
-
-            var orderItemList = _orderItemService.DeleteOrderItem(OrderItemId);
-
-            model.OrderItems = orderItemList.ToList();
-
-            var config = new MapperConfiguration(cfg =>
-                        {
-                            cfg.CreateMap<Order, OrderEditViewModel>();
-                        });
-
-            IMapper mapper = config.CreateMapper();
-
-            var dest = mapper.Map<Order, OrderEditViewModel>(model);
-
-            return PartialView("_OrderItemList", dest);
-
-        }
 
         [HttpGet]
-        public ActionResult DeleteOrder(int OrderId)
+        public ActionResult DeleteOrder(int orderId=0)
         {
-            _orderService.DeleteOrder(OrderId);
+            //_orderservice should return list of recent order items just after delete order
+            _orderService.DeleteOrder(orderId);
 
             OrderStartViewModel orderStartViewModel = new OrderStartViewModel();
-
+            //this should go into delete order
             orderStartViewModel.RecentOrders = _orderService.GetRecentOrders();
 
             return PartialView("_RecentOrders", orderStartViewModel);

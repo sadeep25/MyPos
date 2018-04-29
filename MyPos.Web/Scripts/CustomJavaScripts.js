@@ -21,30 +21,18 @@ $(document).ready(function () {
         source: function (request, response) {
 
             $.ajax({
-                url: "/Order/CustomerAutocomplete",
+                url: "/Customer/CustomerAutocomplete",
                 type: "POST",
                 dataType: "json",
                 data: { searchKey: request.term },
                 success: function (data) {
 
-                    if (data.length == 0) {
+                    response($.map(data, function (item) {
 
-                        var error = [{ CustomerId: -1, CustomerName: "There Is No Such A Customer In Database" }];
+                        return { label: item.CustomerName, value: item.CustomerId };
 
-                        response($.map(error, function (item) {
+                    }));
 
-                            return { label: item.CustomerName, value: item.CustomerId };
-
-                        }));
-                    }
-                    else {
-
-                        response($.map(data, function (item) {
-
-                            return { label: item.CustomerName, value: item.CustomerId };
-
-                        }));
-                    }
 
                 }
             });
@@ -83,30 +71,19 @@ $(document).ready(function () {
         source: function (request, response) {
 
             $.ajax({
-                url: "/Order/ProductAutocompleteList",
+                url: "/Product/ProductAutocompleteList",
                 type: "POST",
                 dataType: "json",
                 data: { searchKey: request.term },
                 success: function (data) {
 
-                    if (data.length == 0) {
 
-                        var error = [{ ProductId: -1, ProductName: "There Is No Such A Product In Database" }];
+                    response($.map(data, function (item) {
 
-                        response($.map(error, function (item) {
+                        return { label: item.ProductName, value: item.ProductId };
 
-                            return { label: item.ProductName, value: item.ProductId };
+                    }));
 
-                        }));
-                    }
-                    else {
-
-                        response($.map(data, function (item) {
-
-                            return { label: item.ProductName, value: item.ProductId };
-
-                        }));
-                    }
                 }
             });
         },
@@ -130,7 +107,7 @@ $(document).ready(function () {
                 $('#errorMessages').html("");
 
                 var options = {
-                    url: "/Order/GetProductByID",
+                    url: "/Product/GetProductByID",
                     type: "POST",
                     dataType: "json",
                     data: { id: ui.item.value }
@@ -379,20 +356,20 @@ $('#UpdateEditedItem').click(function (e) {
 
     var orderId = $('#OrderId').val();
 
-    if (isOrderEdited != "false") {
+   
 
         var array = [];
 
         var orderId = $('#OrderId').val();
 
-        var headers = ["OrderItemQuantity", "OrderItemTotalPrice", "OrderItemId", "OrderItemProductId", "OrderItemOrderId"];
+        var headers = ["OrderItemQuantity", "OrderItemTotalPrice", "OrderItemId", "OrderItemProductId", "OrderItemOrderId", "OrderItemIsDeleted"];
 
         //Reading Customers Shopping Cart Table Values To An Array(Only Product Id, Quantity And SubTotal )
         $('#EditOrderItemTable .orderItemList').has('td').each(function () {
             var arrayItem = {};
             var headersIndex = 0;
             $('td', $(this)).each(function (index, item) {
-                if (index == 3 || index == 4 || index == 5 || index == 6 || index == 7) {
+                if (index == 3 || index == 4 || index == 5 || index == 6 || index == 7 || index == 8) {
                     arrayItem[headers[headersIndex]] = $(item).html();
                     headersIndex++;
                 }
@@ -436,11 +413,11 @@ $('#UpdateEditedItem').click(function (e) {
             },
 
         });
-    } else {
+    //} else {
 
-        window.location.href = "../OrderDetails/" + orderId;
+    //    window.location.href = "../OrderDetails/" + orderId;
 
-    }
+    //}
 
 
 });
@@ -477,7 +454,7 @@ $(document).on('click', '.Edit', function (e) {
     ItemPrice = $(this).parents('tr').find("td:eq( 4 )").html();
 
     var options = {
-        url: "/Order/GetProductByID",
+        url: "/Product/GetProductByID",
         type: "POST",
         dataType: "json",
         data: { id: ProductId.toString() }
@@ -507,35 +484,40 @@ $(document).on('click', '.Edit', function (e) {
 });
 
 $(document).on('click', ".Delete", function (e) {
+    $(this).parents('tr').hide();
+    $(this).parents('tr').find("td:eq( 8 )").html("True");
+    var total = parseInt($('#GrandTotal').html()) - parseInt($(this).parents('tr').find("td:eq( 4 )").html());
+    $('#GrandTotal').html(total);
+ 
+    alert("raw is hidden now");
+    //var ItemId = $(this).parents('tr').find("td:eq( 5 )").html();
 
-    var ItemId = $(this).parents('tr').find("td:eq( 5 )").html();
+    ////Change Total
+    //var itemSubTotal = parseFloat($(this).parents('tr').find("td:eq( 4 )").html());
 
-    //Change Total
-    var itemSubTotal = parseFloat($(this).parents('tr').find("td:eq( 4 )").html());
+    ////Change Total
+    //var orderId = $('#OrderId').val();
 
-    //Change Total
-    var orderId = $('#OrderId').val();
+    //var options = {
+    //    url: "/Order/DeleteOrderItem",
+    //    type: "POST",
+    //    data: {
+    //        OrderItemId: ItemId,
+    //        OrderId: orderId,
+    //        ItemSubTotal: itemSubTotal,
+    //    }
+    //};
 
-    var options = {
-        url: "/Order/DeleteOrderItem",
-        type: "POST",
-        data: {
-            OrderItemId: ItemId,
-            OrderId: orderId,
-            ItemSubTotal: itemSubTotal,
-        }
-    };
+    //var $target = $('#orderEditItem');
 
-    var $target = $('#orderEditItem');
+    //$.ajax(options).done(function (data) {
 
-    $.ajax(options).done(function (data) {
+    //    $('#isOrderEdited').val('false');
 
-        $('#isOrderEdited').val('false');
+    //    var $newHtml = $(data);
 
-        var $newHtml = $(data);
-
-        $target.html($newHtml);
-    });
+    //    $target.html($newHtml);
+    //});
 });
 
 //Delete Recent Order Ajax

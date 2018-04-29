@@ -39,6 +39,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,6 +54,7 @@
     <Compile Include="Exceptions\OrderItemNotFoundException.cs" />
     <Compile Include="Exceptions\OrderNotFoundException.cs" />
     <Compile Include="Exceptions\ProductNotFoundException.cs" />
+    <Compile Include="Exceptions\ProductOutOfStockException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CustomerService.cs" />
     <Compile Include="Services\OrderItemService.cs" />
