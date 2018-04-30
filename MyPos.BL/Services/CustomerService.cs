@@ -28,7 +28,6 @@ namespace MyPos.BL.Services
             {
                 throw new CustomerNotFoundException();
             }
-
             return customer;
         }
 

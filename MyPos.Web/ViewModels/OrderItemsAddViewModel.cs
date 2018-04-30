@@ -23,6 +23,6 @@ namespace MyPos.Web.ViewModels
 
 
         public virtual ICollection<OrderItem> OrderItems { get; set; }
-
+       
     }
 }

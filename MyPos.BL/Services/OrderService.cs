@@ -22,7 +22,7 @@ namespace MyPos.BL.Services
         {
             this.unitOfWork = unitOfWork;
             this._productService = new ProductService(unitOfWork);
-           this._customertService = new CustomerService(unitOfWork);
+            this._customertService = new CustomerService(unitOfWork);
         }
 
         public int Add(Order model)
@@ -33,14 +33,27 @@ namespace MyPos.BL.Services
             {
                 foreach (var item in model.OrderItems)
                 {
-                    try
+                    if (item.OrderItemQuantity > 10)
                     {
-                        _productService.UpdatProductQuantity(item.OrderItemProductId, item.OrderItemQuantity);
+                        throw new ProductMaxQuantityExceededException();
                     }
-                    catch (Exception exp)
+                    else
                     {
-                        throw exp;
-                    }
+                        try
+                        {
+                            _productService.UpdateProductQuantity(item.OrderItemProductId, item.OrderItemQuantity, false);
+                        }
+                        catch (Exception exp)
+                        {
+                            transaction.Rollback();
+                            throw exp;
+                        }
+                    }                   
+                }
+                if (model.OrderTotal > 5000)
+                {
+                    transaction.Rollback();
+                    throw new OrderExceededMaxTotalException();
                 }
                 try
                 {
@@ -62,87 +75,36 @@ namespace MyPos.BL.Services
             }
         }
 
-        public Order GetOrderByID(int id)
+        public Order GetOrderByID(int id,bool withoutDeletedOrderItems)
         {
             Order order = unitOfWork.OrderRepository.GetByID(id);
-
-           
-            return order;
-        } public Order GetOrderByID1(int id)
-        {
-            Order order = unitOfWork.OrderRepository.GetByID(id);
-
-            var orderItemList = (unitOfWork.OrderItemRepository.Get()
-                .Where(x => x.OrderItemIsDeleted != true && x.OrderItemOrderId == id)
-                .Select(r => new OrderItem
-                {
-
-                    OrderItemId = r.OrderItemId,
-
-                    OrderItemProductId = r.OrderItemProductId,
-
-                    OrderItemQuantity = r.OrderItemQuantity,
-
-                    OrderItemTotalPrice = r.OrderItemTotalPrice,
-
-                    OrderItemOrderId = r.OrderItemOrderId,
-
-                    Product = r.Product,
-                    OrderItemIsDeleted = r.OrderItemIsDeleted,
-                    Order=r.Order
-
-                }));
-            order.OrderItems = orderItemList.ToList();
             if (order == null)
             {
                 throw new OrderNotFoundException();
             }
-            return order;
-        }
-
-
-        public void UpdateOrderTotal(int id, int itemSubTotal)
-        {
-            var editmodel = GetOrderByID(id);
-            if (editmodel == null)
+            if (withoutDeletedOrderItems)
             {
-                throw new OrderNotFoundException();
-            }
-            editmodel.OrderTotal = (editmodel.OrderTotal - itemSubTotal);
-            try
+                var orderItemList = (unitOfWork.OrderItemRepository.Get()
+              .Where(x => x.OrderItemIsDeleted != true && x.OrderItemOrderId == id)
+              .Select(r => new OrderItem
+              {
+                  OrderItemId = r.OrderItemId,
+                  OrderItemProductId = r.OrderItemProductId,
+                  OrderItemQuantity = r.OrderItemQuantity,
+                  OrderItemTotalPrice = r.OrderItemTotalPrice,
+                  OrderItemOrderId = r.OrderItemOrderId,
+                  Product = r.Product,
+                  OrderItemIsDeleted = r.OrderItemIsDeleted,
+                  Order = r.Order
+              }));
+                order.OrderItems = orderItemList.ToList();
+                
+                return order;
+            }else
             {
-                unitOfWork.OrderRepository.Update(editmodel);
-                unitOfWork.Save();
-            }
-            catch (DbUpdateException ex)
-            {
-                var sqlException = ex.GetBaseException() as SqlException;
-                if (sqlException != null && sqlException.Number == 547)
-                {
-                    throw new MyPosDbException("Oops A Database Error Occured While Updateing The Order", ex);
-                }
-                throw ex;
+                return order;
             }
         }
-
-
-        //public int GetLatestOrderId()
-        //{
-        //    int nextOrderId;
-        //    int? currentOrderId = (unitOfWork.OrderRepository.Get()
-        //       .OrderByDescending(x => x.OrderId)
-        //      .FirstOrDefault()?.OrderId);
-        //    if (currentOrderId == null)
-        //    {
-        //        nextOrderId = 1;
-        //    }
-        //    else
-        //    {
-        //        nextOrderId = (int)currentOrderId + 1;
-        //    }
-        //    return nextOrderId;
-        //}
-
 
         public IEnumerable<Order> GetRecentOrders()
         {
@@ -160,10 +122,9 @@ namespace MyPos.BL.Services
             return orderList;
         }
 
-
-        public void DeleteOrder(int id)
+        public IEnumerable<Order> DeleteOrder(int id)
         {
-            var editmodel = GetOrderByID(id);
+            var editmodel = GetOrderByID(id,false);
             if (editmodel == null)
             {
                 throw new OrderNotFoundException();
@@ -173,6 +134,7 @@ namespace MyPos.BL.Services
             {
                 unitOfWork.OrderRepository.Update(editmodel);
                 unitOfWork.Save();
+                return GetRecentOrders();
             }
             catch (DbUpdateException ex)
             {
@@ -188,49 +150,86 @@ namespace MyPos.BL.Services
         public void UpdateOrder(Order model)
         {
             if (model == null) { throw new OrderNotFoundException(); }
-
-            var editmodel = GetOrderByID(model.OrderId);
-
+            var editmodel = GetOrderByID(model.OrderId,false);
             if (editmodel == null) { throw new OrderNotFoundException(); }
-
             var items = model.OrderItems.ToList();
-
             var i = 0;
-
             if (items.Count() > 0)
             {
-                foreach (var orderItem in editmodel.OrderItems)
+                using (DbContextTransaction transaction = unitOfWork.DbContext.Database.BeginTransaction())
                 {
-                    if (orderItem.OrderItemIsDeleted == false)
+                    foreach (var orderItem in editmodel.OrderItems)
                     {
-                        orderItem.OrderItemProductId = items[i].OrderItemProductId;
-                        orderItem.OrderItemQuantity = items[i].OrderItemQuantity;
-                        orderItem.OrderItemTotalPrice = items[i].OrderItemTotalPrice;
-                        orderItem.OrderItemIsDeleted = items[i].OrderItemIsDeleted;
-                        i++;
+                        if (orderItem.OrderItemIsDeleted == false)
+                        {
+                            if (orderItem.OrderItemProductId != items[i].OrderItemProductId)
+                            {
+                                try
+                                {
+                                    _productService.UpdateProductQuantity(orderItem.OrderItemProductId, orderItem.OrderItemQuantity, true);
+                                    _productService.UpdateProductQuantity(items[i].OrderItemProductId, items[i].OrderItemQuantity, false);
+                                }
+                                catch (Exception exp)
+                                {
+                                    transaction.Rollback();
+                                    throw exp;
+                                }
+                                orderItem.OrderItemProductId = items[i].OrderItemProductId;
+                            }
+                            //order Total limit exception
+                            if (items[i].OrderItemQuantity > 10)
+                            {
+                                transaction.Rollback();
+                                throw new ProductMaxQuantityExceededException();
+                            }
+                            else
+                            {
+                                orderItem.OrderItemQuantity = items[i].OrderItemQuantity;
+                            }
+                            orderItem.OrderItemTotalPrice = items[i].OrderItemTotalPrice;
+                            if (items[i].OrderItemIsDeleted)
+                            {
+                                orderItem.OrderItemIsDeleted = items[i].OrderItemIsDeleted;
+                                try
+                                {
+                                    _productService.UpdateProductQuantity(orderItem.OrderItemProductId, orderItem.OrderItemQuantity, true);
+                                }
+                                catch (Exception ex)
+                                {
+                                    transaction.Rollback();
+                                    throw ex;
+                                }
+                            }
+                            i++;
+                        }
                     }
-
+                    if (model.OrderTotal > 1000)
+                    {
+                        transaction.Rollback();
+                        throw new OrderExceededMaxTotalException();
+                    }
+                    else
+                    {
+                        editmodel.OrderTotal = model.OrderTotal;
+                    }
+                    try
+                    {
+                        unitOfWork.OrderRepository.Update(editmodel);
+                        unitOfWork.Save();
+                        transaction.Commit();
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        transaction.Rollback();
+                        var sqlException = ex.GetBaseException() as SqlException;
+                        if (sqlException != null && sqlException.Number == 547)
+                        {
+                            throw new MyPosDbException("Oops A Database Error Occured While Updating The Order", ex);
+                        }
+                        throw ex;
+                    }
                 }
-            }
-            editmodel.OrderTotal = model.OrderTotal;
-           
-            try
-            {
-               
-                unitOfWork.OrderRepository.Update(editmodel);
-                unitOfWork.Save();
-            }
-            catch (DbUpdateException ex)
-            {
-                var sqlException = ex.GetBaseException() as SqlException;
-                if (sqlException != null && sqlException.Number == 547)
-                {
-                    throw new MyPosDbException("Oops A Database Error Occured While Updating The Order", ex);
-                }
-                throw ex;
             }
         }
-
-
     }
 }

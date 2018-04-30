@@ -35,8 +35,12 @@ namespace MyPos.Web
                    "~/Content/themes/base/jquery-ui.css"));
 
             //custom JavaScript
-            bundles.Add(new ScriptBundle("~/bundles/customJS").Include(
-                            "~/Scripts/CustomJavaScripts.js"));
+            bundles.Add(new ScriptBundle("~/bundles/orderEditJs").Include(
+                            "~/Scripts/orderEdit.js"));
+            bundles.Add(new ScriptBundle("~/bundles/orderFillJs").Include(
+                            "~/Scripts/orderFill.js"));
+            bundles.Add(new ScriptBundle("~/bundles/orderStartJs").Include(
+                            "~/Scripts/orderStart.js"));
         }
     }
 }
