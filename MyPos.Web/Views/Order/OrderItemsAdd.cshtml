@@ -1,5 +1,5 @@
-﻿@model MyPos.Web.ViewModels.OrderItemsAddViewModel
-
+﻿@model MyPos.Web.ViewModels.OrderViewModel
+<br />
 <div>
     <h4>Add Items To Cart :</h4>
     <div id="errorMessages" class="alert-danger"></div>
@@ -64,3 +64,7 @@
     <input type="button" id="Save" value="Save" />
     <div id="test"></div>
 </div>
+@section Scripts {
+   
+    @Scripts.Render("~/bundles/orderFillJs")
+}

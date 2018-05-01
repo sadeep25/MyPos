@@ -1,11 +1,12 @@
-﻿@model MyPos.Web.ViewModels.OrderEditViewModel
+﻿@model MyPos.Web.ViewModels.OrderViewModel
 
 @{
 
     ViewBag.Title = "OrderEdit";
 }
-
+<br />
 <h2>OrderEdit</h2>
+
 <div>
     <hr />
     <dl class="dl-horizontal">
@@ -72,6 +73,7 @@
                 <tfoot>
                 </tfoot>
             </table>
+            <div id="errorMessages" class="alert-danger"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="EditOrderItemClose">Close</button>
                 <button type="button" class="btn btn-primary" id="EditOrderItem">Save</button>
@@ -91,5 +93,5 @@
     <button type="button" class="btn btn-primary" id="UpdateEditedItem"> Update Order</button>
 </div>
 @section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/orderEditJs")
 }

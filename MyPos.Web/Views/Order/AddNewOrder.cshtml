@@ -1,8 +1,6 @@
 ﻿@model MyPos.Web.ViewModels.OrderStartViewModel
-
+<br />
 <h4>Add A New Order</h4>
-
-
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
@@ -37,8 +35,5 @@
     @Html.Partial("_RecentOrders", Model)
 </div>
 @section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-    @Scripts.Render("~/bundles/jqueryui")
-    @Styles.Render("~/Content/cssjqryUi")
-
+    @Scripts.Render("~/bundles/orderStartJs")
 }
