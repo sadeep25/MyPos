@@ -14,9 +14,7 @@ namespace MyPos.Web.ViewModels
         public int OrderTotal { get; set; }
         public int OrderCustomerId { get; set; }
 
-
         public virtual Customer OrderCustomer { get; set; }
-
         public virtual ICollection<OrderItem> OrderItems { get; set; }
        
     }

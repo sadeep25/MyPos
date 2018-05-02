@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 namespace MyPos.BL.Exceptions
 {
     public class MyPosDbException : Exception
-    {
-        
+    {     
         public MyPosDbException(string message) : base(message)
         {
 
@@ -17,6 +16,5 @@ namespace MyPos.BL.Exceptions
         {
 
         }
-
     }
 }

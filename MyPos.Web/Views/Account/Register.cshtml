@@ -1,0 +1,30 @@
+﻿@model MyPos.Web.ViewModels.LoginModel
+
+<h4>MyPos Registration</h4>
+<hr />
+<div style="width:800px;  margin-right: auto; margin-left: auto;">
+    @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+    {@Html.ValidationSummary()
+    <div class="form-horizontal">
+        <div class="form-group">
+            @Html.LabelFor(x => x.Username, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(x => x.Username, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(x => x.Username, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.Password, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.PasswordFor(x => x.Password, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(x => x.Password, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Register" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+</div>

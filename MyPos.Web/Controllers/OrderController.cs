@@ -9,6 +9,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using AutoMapper;
+
+using MyPos.Web.CustomAttributes;
 using MyPos.Web.ErrorHandlers;
 
 namespace MyPos.Web.Controllers
@@ -31,7 +33,8 @@ namespace MyPos.Web.Controllers
 
         //Get: Add New Order 
         [HttpGet]
-        public ActionResult AddNewOrder()
+        [MyPosAuthorize]
+        public ActionResult NewOrder()
         {
             OrderStartViewModel orderStartViewModel = new OrderStartViewModel();
             orderStartViewModel.RecentOrders = _orderService.GetRecentOrders();
@@ -40,30 +43,32 @@ namespace MyPos.Web.Controllers
 
         //Get: Add New Order 
         [HttpPost]
-
-        public ActionResult AddNewOrder(OrderStartViewModel orderStartViewModel)
+        [MyPosAuthorize]
+        public ActionResult NewOrder(OrderStartViewModel orderStartViewModel)
         {
             OrderViewModel order = new OrderViewModel();
             order.OrderCustomerId = orderStartViewModel.CustomerID;
             order.OrderDate = orderStartViewModel.OrderDate;
             if (ModelState.IsValid)
             {
-                return RedirectToAction("OrderItemsAdd", order);
+                return RedirectToAction("ShoppingCart", order);
             }
             return View(orderStartViewModel);
         }
 
         //Get: Oder Items Add
         [HttpGet]
-        public ActionResult OrderItemsAdd(OrderViewModel orderViewModel)
+        [MyPosAuthorize]
+        public ActionResult ShoppingCart(OrderViewModel orderViewModel)
         {
             return View(orderViewModel);
         }
 
         //Post: Oder Items Add
         [HttpPost]
-        [ActionName("OrderItemsAdd")]
-        public ActionResult OrderItemsAddPost(OrderViewModel orderViewModel)
+        [ActionName("ShoppingCart")]
+        [MyPosAuthorize]
+        public ActionResult ShoppingCartSave(OrderViewModel orderViewModel)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -91,6 +96,7 @@ namespace MyPos.Web.Controllers
         }
 
         [HttpGet]
+        [MyPosAuthorize]
         public ActionResult OrderDetails(int id=0)
         {
             var model = _orderService.GetOrderByID(id,true);
@@ -104,6 +110,7 @@ namespace MyPos.Web.Controllers
         }
 
         [HttpGet]
+        [MyPosAuthorize]
         public ActionResult OrderEdit(int id=0)
         {
             var model = _orderService.GetOrderByID(id,true);  
@@ -117,6 +124,7 @@ namespace MyPos.Web.Controllers
         }
 
         [HttpPost]
+        [MyPosAuthorize]
         public ActionResult OrderEdit(OrderViewModel orderViewModel)
         {
             var config = new MapperConfiguration(cfg =>
@@ -143,9 +151,8 @@ namespace MyPos.Web.Controllers
             }
         }
 
-
-
         [HttpGet]
+        [MyPosAuthorize]
         public ActionResult DeleteOrder(int orderId=0)
         {
             OrderStartViewModel orderStartViewModel = new OrderStartViewModel();

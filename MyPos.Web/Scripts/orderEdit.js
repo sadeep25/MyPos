@@ -2,45 +2,74 @@
 var ItemPrice;
 var SelectedOrdrEditItemRaw;
 $(document).ready(function () {
+    //Product Auto Complele Drop Down
+    $("#ProductName").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/Product/ProductAutocompleteList",
+                type: "POST",
+                dataType: "json",
+                data: { searchKey: request.term },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        return { label: item.ProductName, value: item.ProductId };
+                    }));
+                }
+            });
+        },
+        select: function (event, ui) {
+            event.preventDefault();
+            if (ui.item.value == -1) {
+                $("#ProductName").val("");
+            } else {
+                $("#ProductName").val(ui.item.label);
+                $("#CustomerID").val(ui.item.value);
+                $('#ProductName').css("border-color", "");
+                $('#errorMessages').html("");
+                var options = {
+                    url: "/Product/GetProductByID",
+                    type: "POST",
+                    dataType: "json",
+                    data: { id: ui.item.value }
+                };
+                $.ajax(options).done(function (data) {
+                    $("#ProductId").val(data.ProductId);
+                    $("#ProductDescription").val(data.ProductDescription);
+                    $("#ProductPrice").val(data.ProductCurrentPrice);
+                    $("#ProductAvailableStock").val(data.ProductStockAvailable);
+                });
+            }
+        },
+        change: function (event, ui) {
+            if (ui.item == null) {
+                //here is null if entered value is not match in suggestion list
+                $(this).val((ui.item ? ui.item.id : ""));
+            }
+        }
+    });
+
     $('#ProductQuantity').keyup(CalculateSubTotal);
-
     var notValid = false;
-
     //Function to Calculate Subtotal of an Odrder Item According to Quantity
     function CalculateSubTotal(e) {
-
         $('#errorMessages').html("");
-
         $('#ProductQuantity').css("border-color", "");
-
         var quantity = $('#ProductQuantity').val();
-
         var AvailableStock = $('#ProductAvailableStock').val();
-
         if ((AvailableStock - quantity) < 0) {
-
             $('#errorMessages').html("There Is No Stock Available To Make This Order");
-
             $('#ProductQuantity').css("border-color", "#ff0000");
-
             notValid = true;
-
         } else if (quantity > 10) {
-
             $('#errorMessages').html("You Can't Add More Than 10 Item In a Row");
-
             $('#ProductQuantity').css("border-color", "#ff0000");
-
             notValid = true;
-
         } else {
-
             $('#ProductSubTotal').val($('#ProductPrice').val() * $('#ProductQuantity').val());
-
             notValid = false;
         }
-
     }
+
     //Save Edited Order Items
     $("#EditOrderItem").click(function (e) {
         var productName = $('#ProductName').val();
@@ -101,6 +130,7 @@ $(document).ready(function () {
         var customerId = $('#CustomerId').val();
         var orderId = $('#OrderId').val();
         var orderTotal = $('#GrandTotal').html();
+        debugger;
         $.ajax({
             type: "POST",
             url: "/Order/OrderEdit",
@@ -117,7 +147,7 @@ $(document).ready(function () {
                 } else {
                     for (var error in result.errors) {
 
-                        $('#errorMessages').append(result.errors[error] + '<br />');
+                        $('#errorMessages1').append(result.errors[error] + '<br />');
                     }
                 }
             },
@@ -151,8 +181,7 @@ $(document).on('click', '.Edit', function (e) {
     });
 });
 
-$(document).on('click', ".Delete", function (e) {
-   
+$(document).on('click', ".Delete", function (e) {  
     $(this).parents('tr').hide();
     $(this).parents('tr').find("td:eq( 8 )").html("True");
     var total = parseInt($('#GrandTotal').html()) - parseInt($(this).parents('tr').find("td:eq( 4 )").html());

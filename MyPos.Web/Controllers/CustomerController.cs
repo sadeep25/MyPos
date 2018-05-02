@@ -12,23 +12,19 @@ namespace MyPos.Web.Controllers
     {
         private readonly CustomerService _customerService;
 
-        // GET: Customer
-        public CustomerController() : this(new UnitOfWork())
-        {
-
-        }
+        public CustomerController() 
+            : this(new UnitOfWork())
+        { }
 
         public CustomerController(UnitOfWork unitOfWork)
         {
             this._customerService = new CustomerService(unitOfWork);
         }
 
-        //Add New Order AJAX Requests
         [HttpPost]
         public ActionResult CustomerAutocomplete(string searchKey)
         {
             var model = _customerService.GetCustomerAutoCompleteList(searchKey);
-
             return Json(model, JsonRequestBehavior.AllowGet);
         }
     }

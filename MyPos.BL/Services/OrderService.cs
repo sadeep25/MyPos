@@ -18,6 +18,7 @@ namespace MyPos.BL.Services
         private UnitOfWork unitOfWork;
         private readonly ProductService _productService;
         private readonly CustomerService _customertService;
+
         public OrderService(UnitOfWork unitOfWork)
         {
             this.unitOfWork = unitOfWork;
@@ -97,8 +98,7 @@ namespace MyPos.BL.Services
                   OrderItemIsDeleted = r.OrderItemIsDeleted,
                   Order = r.Order
               }));
-                order.OrderItems = orderItemList.ToList();
-                
+                order.OrderItems = orderItemList.ToList();               
                 return order;
             }else
             {
@@ -203,7 +203,7 @@ namespace MyPos.BL.Services
                             i++;
                         }
                     }
-                    if (model.OrderTotal > 1000)
+                    if (model.OrderTotal > 5000)
                     {
                         transaction.Rollback();
                         throw new OrderExceededMaxTotalException();

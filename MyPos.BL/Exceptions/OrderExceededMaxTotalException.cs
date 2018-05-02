@@ -11,8 +11,6 @@ namespace MyPos.BL.Exceptions
         public OrderExceededMaxTotalException():base("Order Exceeded Max Total of 5000 Rs Per Order")
         {
                 
-        }
-    
-    }
-   
+        }   
+    }   
 }

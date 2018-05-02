@@ -15,10 +15,6 @@ namespace MyPos.DAL.Migrations
 
         protected override void Seed(MyPos.DAL.Context.MyPosDbContext context)
         {
-            //  This method will be called after migrating to the latest version.
-
-            //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
-            //  to avoid creating duplicate seed data.
             context.Customers.AddOrUpdate(e => e.CustomerName,
                  new Customer()
                  {

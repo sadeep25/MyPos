@@ -23,7 +23,6 @@ namespace MyPos.BL.Services
         public Customer GetCustomerByID(int id)
         {
             var customer = unitOfWork.CustomerRepository.GetByID(id);
-
             if (customer==null)
             {
                 throw new CustomerNotFoundException();
@@ -48,8 +47,7 @@ namespace MyPos.BL.Services
             else
             {
                 return customerList;
-            }
-         
+            }         
         }
 
       

@@ -17,7 +17,6 @@ namespace MyPos.DAL.Repository
         private GenericRepository<Product> productRepository;
         private GenericRepository<OrderItem> orderItemRepository;
 
-
         public GenericRepository<Customer> CustomerRepository
         {
             get

@@ -14,23 +14,15 @@ namespace MyPos.DAL.Entity
         [Column(Order = 1)]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int ProductId { get; set; }
-
         [Required]
         [MaxLength(60)]
         public string ProductName { get; set; }
-
         [Required]
         [MaxLength(60)]
         public string ProductDescription { get; set; }
-
         [Required]
         public int ProductCurrentPrice { get; set; }
-
         [Required]
         public int ProductStockAvailable { get; set; }
-
-
-
-
     }
 }
