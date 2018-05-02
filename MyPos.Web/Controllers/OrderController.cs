@@ -1,17 +1,12 @@
-﻿using MyPos.BL.Exceptions;
-using MyPos.BL.Services;
-using MyPos.DAL.Entity;
+﻿using MyPos.DAL.Entity;
 using MyPos.DAL.Repository;
 using MyPos.Web.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using AutoMapper;
-
 using MyPos.Web.CustomAttributes;
 using MyPos.Web.ErrorHandlers;
+using MyPos.BL.Services;
 
 namespace MyPos.Web.Controllers
 {
