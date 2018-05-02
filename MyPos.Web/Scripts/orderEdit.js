@@ -1,6 +1,7 @@
 ﻿var GrandTotal = 0;
 var ItemPrice;
 var SelectedOrdrEditItemRaw;
+
 $(document).ready(function () {
     //Product Auto Complele Drop Down
     $("#ProductName").autocomplete({
@@ -70,7 +71,7 @@ $(document).ready(function () {
         }
     }
 
-    //Save Edited Order Items
+    //Save Edited Order Items To Shopping Cart
     $("#EditOrderItem").click(function (e) {
         var productName = $('#ProductName').val();
         var GrandTotal = (parseInt($('#GrandTotal').html()) - ItemPrice);
@@ -107,14 +108,15 @@ $(document).ready(function () {
         notValid = false;
     });
 
-    //Update Edited Item in Database
+    //Update Edited Order In The Database
     $('#UpdateEditedItem').click(function (e) {
         //var isOrderEdited = $('#isOrderEdited').val();
         var orderId = $('#OrderId').val();
         var array = [];
         var orderId = $('#OrderId').val();
         var headers = ["OrderItemQuantity", "OrderItemTotalPrice", "OrderItemId", "OrderItemProductId", "OrderItemOrderId", "OrderItemIsDeleted"];
-        //Reading Customers Shopping Cart Table Values To An Array(Only Product Id, Quantity And SubTotal )
+
+        //Reading Customers Shopping Cart Table Values To An Array
         $('#EditOrderItemTable .orderItemList').has('td').each(function () {
             var arrayItem = {};
             var headersIndex = 0;
@@ -125,12 +127,11 @@ $(document).ready(function () {
                 }
             });
             array.push(arrayItem);
-        });
+        }); 
         var orderDateEntered = $('#OderDateID').val();
         var customerId = $('#CustomerId').val();
         var orderId = $('#OrderId').val();
-        var orderTotal = $('#GrandTotal').html();
-        debugger;
+        var orderTotal = $('#GrandTotal').html();      
         $.ajax({
             type: "POST",
             url: "/Order/OrderEdit",

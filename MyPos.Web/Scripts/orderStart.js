@@ -1,7 +1,6 @@
 ﻿$(document).ready(function () {
-
+    //Setting The DateTime Field To Empty
     $('#OrderDate').val("");
-
     var itemsArray = [];
 
     //setting Jquery DateTimePicker

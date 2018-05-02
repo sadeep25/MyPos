@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-[assembly: OwinStartup(typeof (MyPos.Web.Startup))]
+[assembly: OwinStartup(typeof(MyPos.Web.Startup))]
 namespace MyPos.Web
 {
     public class Startup
@@ -24,7 +24,6 @@ namespace MyPos.Web
             app.CreatePerOwinContext<SignInManager<IdentityUser, string>>(
                 (opt, cont) =>
                     new SignInManager<IdentityUser, string>(cont.Get<UserManager<IdentityUser>>(), cont.Authentication));
-
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie
