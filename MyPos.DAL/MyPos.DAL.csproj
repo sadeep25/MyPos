@@ -55,6 +55,10 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\GenericRepository.cs" />
+    <Compile Include="Repository\NewFolder\GenericRepocitory.cs" />
+    <Compile Include="Repository\NewFolder\IRepository.cs" />
+    <Compile Include="Repository\NewFolder\IUnitOfWork.cs" />
+    <Compile Include="Repository\NewFolder\UnitOfWork.cs" />
     <Compile Include="Repository\UnitOfWork.cs" />
   </ItemGroup>
   <ItemGroup />
