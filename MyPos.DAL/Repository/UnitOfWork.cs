@@ -17,16 +17,11 @@ namespace MyPos.DAL.Repository
         private GenericRepocitory<Product> productRepository;
         private GenericRepocitory<OrderItem> orderItemRepository;
 
-
-
         public UnitOfWork(DbContext dbContext)
         {
             context = (MyPosDbContext)dbContext;
         }
-
-       
-
-
+      
         public GenericRepocitory<Customer> CustomerRepository
         {
             get

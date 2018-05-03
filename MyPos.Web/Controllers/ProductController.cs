@@ -19,7 +19,7 @@ namespace MyPos.Web.Controllers
             this._productService = new ProductService(unitOfWork);
         }
 
-       
+        //Product Auto Complete Drowdown Ajax
         [HttpPost]
         public ActionResult ProductAutocompleteList(string searchKey)
         {
@@ -27,6 +27,7 @@ namespace MyPos.Web.Controllers
             return Json(model, JsonRequestBehavior.AllowGet);
         }
         
+        //Get Product Details Ajax
         [HttpPost]
         public ActionResult GetProductByID(int id)
         {

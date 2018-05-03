@@ -53,7 +53,7 @@ namespace MyPos.Web.Controllers
             return View(orderStartViewModel);
         }
 
-        //Get: Oder Items Add
+        //Get: Shopping Cart
         [HttpGet]
         [MyPosAuthorize]
         public ActionResult ShoppingCart(OrderViewModel orderViewModel)
@@ -61,7 +61,7 @@ namespace MyPos.Web.Controllers
             return View(orderViewModel);
         }
 
-        //Post: Oder Items Add
+        //Post: Shopping Cart
         [HttpPost]
         [ActionName("ShoppingCart")]
         [MyPosAuthorize]
@@ -92,6 +92,7 @@ namespace MyPos.Web.Controllers
             }     
         }
 
+        //Get: Order Details
         [HttpGet]
         [MyPosAuthorize]
         public ActionResult OrderDetails(int id=0)
@@ -106,6 +107,7 @@ namespace MyPos.Web.Controllers
             return View(order);
         }
 
+        //Get: Order Edit
         [HttpGet]
         [MyPosAuthorize]
         public ActionResult OrderEdit(int id=0)
@@ -120,6 +122,7 @@ namespace MyPos.Web.Controllers
             return View(order);
         }
 
+        //Post: Order Edit
         [HttpPost]
         [MyPosAuthorize]
         public ActionResult OrderEdit(OrderViewModel orderViewModel)
@@ -148,6 +151,7 @@ namespace MyPos.Web.Controllers
             }
         }
 
+        //Post: Order Delete Ajax
         [HttpGet]
         [MyPosAuthorize]
         public ActionResult DeleteOrder(int orderId=0)

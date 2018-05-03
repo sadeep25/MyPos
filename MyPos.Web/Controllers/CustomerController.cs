@@ -19,6 +19,7 @@ namespace MyPos.Web.Controllers
             this._customerService = new CustomerService(unitOfWork);
         }
 
+        //Customer Auto Complete Drowdown Ajax
         [HttpPost]
         public ActionResult CustomerAutocomplete(string searchKey)
         {
