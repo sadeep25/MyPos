@@ -8,6 +8,8 @@ using MyPos.Web.CustomAttributes;
 using MyPos.Web.ErrorHandlers;
 using MyPos.BL.Services;
 
+using MyPos.DAL.Context;
+
 namespace MyPos.Web.Controllers
 {
     [MyPosErrorHandler]
@@ -17,7 +19,7 @@ namespace MyPos.Web.Controllers
         private readonly OrderService _orderService;
 
         public OrderController()
-           : this(new UnitOfWork())
+           : this(new UnitOfWork(new MyPosDbContext()))
         { }
 
         //instantiating Services

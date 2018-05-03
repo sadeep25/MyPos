@@ -1,5 +1,7 @@
 ﻿using MyPos.BL.Services;
+using MyPos.DAL.Context;
 using MyPos.DAL.Repository;
+
 using System.Web.Mvc;
 
 namespace MyPos.Web.Controllers
@@ -9,7 +11,7 @@ namespace MyPos.Web.Controllers
         private readonly ProductService _productService;
 
         public ProductController()
-            :this(new UnitOfWork())
+            :this(new UnitOfWork(new MyPosDbContext()))
         { }
 
         public ProductController(UnitOfWork unitOfWork)

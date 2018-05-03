@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyPos.DAL.Repository.NewFolder
+namespace MyPos.DAL.Repository
 {
     public interface IRepository<TEntity> where TEntity : class
     {

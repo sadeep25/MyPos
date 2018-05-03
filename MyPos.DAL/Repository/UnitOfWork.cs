@@ -1,61 +1,75 @@
-﻿using MyPos.DAL.Context;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using MyPos.DAL.Context;
 using MyPos.DAL.Entity;
-using System;
 
 namespace MyPos.DAL.Repository
 {
-    public class UnitOfWork : IDisposable
+    public class UnitOfWork : IUnitOfWork, IDisposable
     {
-        private MyPosDbContext context = new MyPosDbContext();
+        private readonly MyPosDbContext context;
+        private GenericRepocitory<Customer> customerRepository;
+        private GenericRepocitory<Order> orderRepository;
+        private GenericRepocitory<Product> productRepository;
+        private GenericRepocitory<OrderItem> orderItemRepository;
 
-        private GenericRepository<Customer> customerRepository;
-        private GenericRepository<Order> orderRepository;
-        private GenericRepository<Product> productRepository;
-        private GenericRepository<OrderItem> orderItemRepository;
 
-        public GenericRepository<Customer> CustomerRepository
+
+        public UnitOfWork(DbContext dbContext)
+        {
+            context = (MyPosDbContext)dbContext;
+        }
+
+       
+
+
+        public GenericRepocitory<Customer> CustomerRepository
         {
             get
             {
                 if (this.customerRepository == null)
                 {
-                    this.customerRepository = new GenericRepository<Customer>(context);
+                    this.customerRepository = new GenericRepocitory<Customer>(context);
                 }
                 return customerRepository;
             }
         }
 
-        public GenericRepository<Order> OrderRepository
+        public GenericRepocitory<Order> OrderRepository
         {
             get
             {
                 if (this.orderRepository == null)
                 {
-                    this.orderRepository = new GenericRepository<Order>(context);
+                    this.orderRepository = new GenericRepocitory<Order>(context);
                 }
                 return orderRepository;
             }
         }
 
-        public GenericRepository<Product> ProductRepository
+        public GenericRepocitory<Product> ProductRepository
         {
             get
             {
                 if (this.productRepository == null)
                 {
-                    this.productRepository = new GenericRepository<Product>(context);
+                    this.productRepository = new GenericRepocitory<Product>(context);
                 }
                 return productRepository;
             }
         }
 
-        public GenericRepository<OrderItem> OrderItemRepository
+        public GenericRepocitory<OrderItem> OrderItemRepository
         {
             get
             {
                 if (this.orderItemRepository == null)
                 {
-                    this.orderItemRepository = new GenericRepository<OrderItem>(context);
+                    this.orderItemRepository = new GenericRepocitory<OrderItem>(context);
                 }
                 return orderItemRepository;
             }
